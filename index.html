@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pediatrik Doz Hesaplayıcı</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b6e74">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Pediatrik Doz">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<style>
+:root{--bg:#eef4f4;--card:#fff;--ink:#0f2a2e;--mute:#546b6f;--line:#cfdcdc;--accent:#0b6e74;--accent-ink:#fff;--warn-bg:#fff4e0;--warn:#8a4b00;--bad-bg:#fdecea;--bad:#a4271c;--ok-bg:#e3f3f1;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1b1d;--card:#142729;--ink:#e6f1f1;--mute:#93aeb1;--line:#27403f;--accent:#4fc3c9;--accent-ink:#062326;--warn-bg:#3a2b10;--warn:#f0c27a;--bad-bg:#3b1815;--bad:#ff9d93;--ok-bg:#12302f}}
+:root[data-theme="dark"]{--bg:#0d1b1d;--card:#142729;--ink:#e6f1f1;--mute:#93aeb1;--line:#27403f;--accent:#4fc3c9;--accent-ink:#062326;--warn-bg:#3a2b10;--warn:#f0c27a;--bad-bg:#3b1815;--bad:#ff9d93;--ok-bg:#12302f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:520px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.35rem;margin:0 0 4px;letter-spacing:-.01em}
+.sub{color:var(--mute);margin:0 0 16px;font-size:.92rem}
+.note{background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:.86rem;margin-bottom:16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+label{display:block;font-size:.88rem;font-weight:600;margin:12px 0 4px}
+label:first-child{margin-top:0}
+select,input{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px}
+select:focus,input:focus{outline:3px solid var(--accent);outline-offset:1px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:.78rem;color:var(--mute);margin-top:4px}
+.big{font-size:2rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1.15}
+.big small{font-size:1rem;font-weight:500;color:var(--mute)}
+.lbl{font-size:.82rem;color:var(--mute)}
+dl{margin:14px 0 0;display:grid;grid-template-columns:auto 1fr;gap:8px 14px}
+dt{color:var(--mute);font-size:.88rem}
+dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.msg{border-radius:10px;padding:10px 12px;font-size:.88rem;margin-top:12px}
+.msg.warn{background:var(--warn-bg);color:var(--warn)}
+.msg.bad{background:var(--bad-bg);color:var(--bad);font-weight:600}
+.src{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:.8rem;color:var(--mute)}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;font:inherit;font-weight:600;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 8px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.rx{display:inline-block;background:var(--ok-bg);color:var(--accent);font-weight:700;border-radius:8px;padding:4px 10px;margin:6px 0 8px;font-size:.95rem}
+.src a{color:var(--accent)}
+[hidden]{display:none!important}
+.ivb{background:var(--bad-bg);color:var(--bad);border-radius:10px;padding:10px 12px;font-size:.88rem;margin-bottom:16px}
+.ivp{border-color:var(--bad)}
+.empty{color:var(--mute);text-align:center;padding:8px 0}
+footer{font-size:.78rem;color:var(--mute);text-align:center}
+</style>
+</head>
+<body>
+<main>
+<h1>Pediatrik doz hesaplayıcı</h1>
+<p class="sub">İlacı ve kiloyu girin; günlük doz, öğün başı doz ve sıklık hesaplansın.</p>
+<div class="seg" id="tabs" role="group" aria-label="Bölüm" style="margin-bottom:16px">
+<button type="button" data-t="oral" aria-pressed="true">Şurup / oral</button>
+<button type="button" data-t="iv" aria-pressed="false">Acil IV</button>
+</div>
+<div class="note"><b>Taslak veri.</b> Doz aralıkları yaygın referans değerleridir ve henüz KÜB/KT ile doğrulanmamıştır. Klinik kullanımdan önce çocuk hekimi veya eczacı onayından geçirin.</div>
+
+<div id="oral">
+<section class="panel">
+<label for="ilac">İlaç</label>
+<select id="ilac"></select>
+<div class="row">
+<div><label for="kilo">Kilo (kg)</label><input id="kilo" inputmode="decimal" placeholder="örn. 14,5" autocomplete="off"></div>
+<div><label for="yas">Yaş (ay)</label><input id="yas" inputmode="numeric" placeholder="örn. 18" autocomplete="off"></div>
+</div>
+<label for="konc">Şurup konsantrasyonu ve örnek ürün</label>
+<select id="konc"></select>
+<label id="siklbl">Günde kaç kez</label>
+<div class="seg" id="sik" role="group" aria-labelledby="siklbl"></div>
+</section>
+
+<section class="panel" id="sonuc" aria-live="polite"></section>
+</div>
+<div id="iv" hidden>
+<div class="ivb"><b>Acil IV bölümü.</b> Şurup hesaplarından ayrıdır. Ampul konsantrasyonunu, seyreltmeyi ve veriliş hızını her seferinde kontrol edin.</div>
+<section class="panel ivp">
+<label for="ivilac">İlaç (IV / IM / IO)</label>
+<select id="ivilac"></select>
+<div class="row">
+<div><label for="kiloIv">Kilo (kg)</label><input id="kiloIv" inputmode="decimal" placeholder="örn. 14,5" autocomplete="off"></div>
+<div><label for="yasIv">Yaş (ay)</label><input id="yasIv" inputmode="numeric" placeholder="örn. 18" autocomplete="off"></div>
+</div>
+<label for="ivampul">Ampul / flakon</label>
+<select id="ivampul"></select>
+</section>
+<section class="panel ivp" id="ivsonuc" aria-live="polite"></section>
+</div>
+<footer>Son karar hekime aittir.</footer>
+</main>
+<script>
+// Doz tablosu: değerleri onaylı kaynaktan güncelleyin. Ürün/konsantrasyon bilgileri bağlantılı kaynaklardan alındı; doz aralıkları henüz KÜB ile doğrulanmadı.
+const ILACLAR = {
+  parasetamol:{grup:"Ateş ve ağrı",ad:"Parasetamol",doz:[10,15],gunMaxKg:60,gunMaxMg:4000,dozMaxMg:1000,minAy:3,minKg:4,
+    sik:[{n:4,saat:6},{n:3,saat:8}],sikNot:"En az 4 saat ara verin; 24 saatte en fazla 4 doz.",
+    konc:[{mg:120,urun:"Calpol Süspansiyon (Türkiye)",kaynak:"TİTCK listesi",url:"https://www.ilacabak.com/calpol-120-mg-150-ml-suspansiyon-2985"},
+          {mg:250,urun:"Calpol 6 Plus Süspansiyon (Türkiye)",minAy:72,kaynak:"TİTCK listesi",url:"https://www.ilacabak.com/calpol-6-plus-250-mg-5-ml-150-ml-surup-2987"}],
+    kaynak:"Yaygın referans aralığı (10–15 mg/kg/doz)"},
+  ibuprofen:{grup:"Ateş ve ağrı",trKub:true,ad:"İbuprofen",doz:[5,10],gunMaxKg:30,gunMaxMg:1200,dozMaxMg:400,minAy:3,minKg:5,
+    sik:[{n:3,saat:8},{n:4,saat:6}],sikNot:"Günde 3–4 doza bölünür (ürün bilgisi: 20–30 mg/kg/gün). 4 doz seçilirse günlük üst sınır (30 mg/kg) uygulanır.",
+    konc:[{mg:100,urun:"Dolven Pediyatrik Şurup",kaynak:"TİTCK KT",url:"https://titck.gov.tr/storage/Archive/2021/kubKtAttachments/yaynlanacakktdolvenurup_fc28d4d8-84c2-44ec-8973-11751b18ae15.pdf"},
+          {mg:100,urun:"Pedifen Pediatrik Şurup",kaynak:"TİTCK KT",url:"https://titck.gov.tr/storage/kubKtAttachments/bd256e8a19750.pdf"}],
+    kaynak:"Yaygın referans aralığı (5–10 mg/kg/doz); 3 ay ve 5 kg alt sınırı yurt dışı ürün bilgisinden"},
+  amoksisilin:{grup:"Antibiyotikler",trKub:true,sure:"Hekim belirler; incelemesiz 14 günü aşmamalı (KÜB)",ad:"Amoksisilin-klavulanat",gun:[40,90],gunMaxKg:70,gunMaxMg:2800,dozMaxMg:1400,minAy:1,minKg:3,
+    sik:[{n:2,saat:12},{n:3,saat:8}],sikNot:"Augmentin BID formları günde 2 doz (12 saatte bir) içindir.",
+    konc:[{mg:200,urun:"Augmentin BID 200/28,5 süspansiyon (GSK, Türkiye)",n:2,gun:[25,70],gunMaxKg:70,minAy:2,yasGunMax:{ay:24,mgKg:45},kaynak:"TİTCK KÜB",dozKaynak:"Augmentin BID KÜB (Türkiye): amoksisilin 25–45 mg/kg/gün, otit/sinüzit/alt solunum yolunda 70 mg/kg/gün'e kadar, 2 doza bölünmüş; 2 yaş altında 45 mg/kg/gün üstü için veri yok; 2 aydan küçükte doz önerilmez",url:"https://cdn.ilacrehberi.com/augmentinbid-200-mg-28mg-oral-sspansiyon-hazrlama-a922-kub.pdf"},
+          {mg:400,urun:"Augmentin BID 400/57 süspansiyon (GSK, Türkiye)",n:2,gun:[25,70],gunMaxKg:70,minAy:2,yasGunMax:{ay:24,mgKg:45},kaynak:"TİTCK fiyat listesi; doz 200/28 KÜB'ine göre",dozKaynak:"Augmentin BID KÜB (Türkiye): amoksisilin 25–45 mg/kg/gün, otit/sinüzit/alt solunum yolunda 70 mg/kg/gün'e kadar, 2 doza bölünmüş; 2 yaş altında 45 mg/kg/gün üstü için veri yok; 2 aydan küçükte doz önerilmez (200/28 KÜB'i; 400/57 KÜB'i henüz yayımlanmamış)",url:"https://ilacabak.com/augmentin-400-mg-57-mg-5-ml-oral-suspansiyon-hazirlamak-icin-kuru-toz-100-ml-32107"}],
+    kaynak:"Yaygın referans aralığı (40–90 mg/kg/gün)"},
+  azitromisin:{grup:"Antibiyotikler",trKub:true,ad:"Azitromisin",doz:[10,10],gunMaxKg:10,gunMaxMg:500,dozMaxMg:500,minAy:6,minKg:5,
+    sik:[{n:1,saat:24}],sure:"Genelde 3 gün (hekim belirler)",sikNot:"Günde tek doz. Alternatif rejimlerde (1. gün 10 mg/kg, sonra 5 mg/kg × 5 gün; farenjit/tonsillitte 12 mg/kg × 5 gün) dozu hekim ayarlar.",
+    konc:[{mg:200,urun:"Zitromax Süspansiyon (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/T%C4%B0TCK%20Z%C4%B0TROMAX%20S%C3%9CSP%20UYGUN%20K%C3%9CB.pdf_ed212d6a-2ca2-4d96-bbfd-6922596d0e3c.pdf"}],
+    kaynak:"10 mg/kg/gün, günde 1 kez, 3 gün (Zitromax TİTCK KÜB); günlük en fazla 500 mg; 6 ay alt sınırı yurt dışı SmPC'den"},
+  klaritromisin:{grup:"Antibiyotikler",trKub:true,ad:"Klaritromisin",doz:[7.5,7.5],gunMaxKg:15,gunMaxMg:1000,dozMaxMg:500,minAy:6,minKg:5,
+    sik:[{n:2,saat:12}],sikNot:"Günde 2 doz; 6 ay–12 yaş çocuklar için süspansiyon. Öğün başı en fazla 500 mg. Yemekten bağımsız verilebilir.",
+    konc:[{mg:125,urun:"Klaromin Süspansiyon (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/czxnhWOt8wMgl.pdf"},
+          {mg:125,urun:"Laricid Süspansiyon (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/KCT6VnnYRKMx0.pdf"},
+          {mg:250,urun:"Klacid Süspansiyon (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/e8yd3z37jLnhd.pdf"}],
+    kaynak:"7,5 mg/kg, günde 2 kez (Klacid, Klaromin, Laricid TİTCK KÜB); en fazla 500 mg/doz yurt dışı SmPC'den"},
+  sefiksim:{grup:"Antibiyotikler",trKub:true,ad:"Sefiksim",gun:[8,8],gunMaxKg:8,gunMaxMg:400,dozMaxMg:400,minAy:6,minKg:5,
+    sik:[{n:1,saat:24},{n:2,saat:12}],sikNot:"Günde tek doz 8 mg/kg veya 12 saatte bir 4 mg/kg. 10 yaş üstü veya 50 kg üzeri çocuklarda erişkin dozu (günlük 200–400 mg) kullanılır.",
+    konc:[{mg:100,urun:"Suprax Süspansiyon (Türkiye)",kaynak:"TİTCK KÜB",url:"https://www.eczacibasiilac.com.tr/EIP/media/EIP_Media/PDF/Suprax_Suspansiyon_KUB.pdf"},
+          {mg:100,urun:"Zimaks Süspansiyon (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/BTgWSDHClDlCC.pdf"},
+          {mg:100,urun:"Fixef Süspansiyon (Türkiye)",kaynak:"TİTCK KT",url:"https://titck.gov.tr/storage/Archive/2021/kubKtAttachments/FXEF100mg5mLpediatrikoralsspansiyonhazrlamakiinkurutozKT_c79875f7-c6a6-4ae2-b3fe-4f3f3d49dfac.pdf"}],
+    kaynak:"8 mg/kg/gün, 1 veya 2 doz, 6 ay ve üzeri (TİTCK KÜB: Suprax, Zimaks)"},
+  sefuroksim:{grup:"Antibiyotikler",trKub:true,ad:"Sefuroksim aksetil",doz:[10,15],gunMaxKg:30,gunMaxMg:500,dozMaxMg:250,dozMaxLo:125,minAy:3,minKg:4,
+    sik:[{n:2,saat:12}],sikNot:"10 mg/kg/doz (en fazla 125 mg): tonsillit, farenjit, sinüzit. 15 mg/kg/doz (en fazla 250 mg): otit ve ağır enfeksiyonlar. Yemekle birlikte verilir.",
+    konc:[{mg:125,urun:"Zinnat Süspansiyon (Türkiye)",kaynak:"Zinnat TİTCK KT; konsantrasyon emc SmPC",url:"https://titck.gov.tr/storage/Archive/2022/kubKtAttachments/kt_a1b7aa13-4d1e-4bba-8d28-965e8e0a14a9.pdf"},
+          {mg:250,urun:"Zinnat Süspansiyon (Türkiye)",kaynak:"Zinnat TİTCK KT; konsantrasyon emc SmPC",url:"https://titck.gov.tr/storage/Archive/2022/kubKtAttachments/kt_a1b7aa13-4d1e-4bba-8d28-965e8e0a14a9.pdf"}],
+    kaynak:"Günde 2 kez 10 mg/kg (en fazla 125 mg) – 15 mg/kg (en fazla 250 mg) (Zinnat TİTCK KT); 3 ay alt sınırı emc SmPC'den"},
+  setirizin:{grup:"Alerji",trKub:true,ad:"Setirizin",tip:"yas",bant:[[24,72,2.5,2.5,2],[72,144,5,5,2],[144,1200,10,10,1]],gunMaxKg:100,gunMaxMg:10,dozMaxMg:10,minAy:24,minKg:3,
+    sikNot:"2–12 yaş günde 2 kez, 12 yaş üstü günde 1 kez. 2 yaş altında önerilmez.",
+    konc:[{mg:5,urun:"Zyrtec Şurup (1 mg/mL, Türkiye)",kaynak:"TİTCK ürün KT",url:"https://medikalakademi.com.tr/wp-content/uploads/2019/12/zyrtec-setirizin-surup-1mg-recete.pdf"},
+          {mg:5,urun:"Yenizin Şurup (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/Archive/2021/kubKtAttachments/kb_191d1169-591b-4b33-b09e-276a7cd2529e.pdf"}],
+    kaynak:"Yaşa göre: 2–6 yaş 2,5 mg ×2; 6–12 yaş 5 mg ×2; 12 yaş üstü 10 mg ×1 (TİTCK KÜB)"},
+  desloratadin:{grup:"Alerji",trKub:true,ad:"Desloratadin",tip:"yas",bant:[[12,72,1.25,1.25,1],[72,144,2.5,2.5,1],[144,1200,5,5,1]],gunMaxKg:100,gunMaxMg:5,dozMaxMg:5,minAy:12,minKg:3,
+    sikNot:"Günde tek doz. 1 yaş altında etkinlik ve güvenlilik belirlenmemiştir.",
+    konc:[{mg:2.5,urun:"Aerius Oral Çözelti 0,5 mg/mL (Türkiye)",kaynak:"TİTCK KT/KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/63e6abf521098.pdf"}],
+    kaynak:"Yaşa göre: 1–5 yaş 1,25 mg; 6–11 yaş 2,5 mg; 12 yaş üstü 5 mg, günde 1 kez (Aerius KÜB)"},
+  ondansetron:{grup:"Sindirim sistemi",ad:"Ondansetron",tip:"kilo",bant:[[8,15,2,2,1],[15,30,4,4,1],[30,200,8,8,1]],gunMaxKg:100,gunMaxMg:8,dozMaxMg:8,minAy:6,minKg:8,
+    sikNot:"Gastroenterit kusmasında tek doz (etiket dışı kullanım). Türkiye prospektüsü yetişkin ağırlıklıdır, çocuk dozu için yurt dışı çalışma kullanıldı.",
+    konc:[{mg:4,urun:"Zofran Şurup 50 mL (GSK, Türkiye)",kaynak:"TİTCK ilaç listesi",url:"https://www.ilacrehberi.com/v/zofran-surup-50-ml-9fc8/ilac-prospektusu/formulu/"}],
+    kaynak:"Kilo aralığına göre tek doz: 8–15 kg 2 mg, 15–30 kg 4 mg, 30 kg üstü 8 mg (Freedman, NEJM 2006)"},
+  metronidazol:{grup:"Antibiyotikler",trKub:true,ad:"Metronidazol",gun:[20,40],gunMaxKg:40,gunMaxMg:2400,dozMaxMg:2400,minAy:2,minKg:3,
+    sik:[{n:3,saat:8},{n:1,saat:24}],sikNot:"Anaerop enfeksiyonda 20–30 mg/kg/gün (tek doz veya 8 saatte bir 7,5 mg/kg); amibiyaz/giardiyazda 30–40 mg/kg/gün, 3 doza bölünür. Günlük en fazla 2400 mg.",
+    konc:[{mg:125,urun:"Flagyl Süspansiyon (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/ce28385d81019.pdf"}],
+    kaynak:"20–40 mg/kg/gün, 8 hafta ve üzeri (Flagyl TİTCK KÜB)"}
+};
+const $ = id => document.getElementById(id);
+const num = v => parseFloat(String(v).replace(",", "."));
+const f = (n, d = 0) => n.toLocaleString("tr-TR", {maximumFractionDigits: d});
+const rng = (a, b, d = 0) => (Math.abs(a - b) < 1e-9 ? f(a, d) : f(a, d) + "–" + f(b, d));
+let sikIdx = 0;
+
+{ const g = {}; Object.entries(ILACLAR).forEach(([k, v]) => (g[v.grup] = g[v.grup] || []).push([k, v]));
+  $("ilac").innerHTML = Object.entries(g).map(([n, l]) => `<optgroup label="${n}">${l.map(([k, v]) => `<option value="${k}">${v.ad}</option>`).join("")}</optgroup>`).join(""); }
+
+function fillDrug() {
+  const d = ILACLAR[$("ilac").value];
+  $("konc").innerHTML = d.konc.map((c, i) => `<option value="${i}">${c.mg} mg / 5 mL · ${c.urun}</option>`).join("");
+  sikIdx = 0; fillSik();
+}
+function fillSik() {
+  const d = ILACLAR[$("ilac").value];
+  if (d.bant) { $("sik").innerHTML = '<div class="hint">Sıklık yaş/kilo aralığına göre belirlenir.</div>'; return; }
+  $("sik").innerHTML = d.sik.map((s, i) => `<button type="button" data-i="${i}" aria-pressed="${i === sikIdx}">Günde ${s.n} kez</button>`).join("");
+}
+
+function hesapla() {
+  const d = ILACLAR[$("ilac").value], out = $("sonuc"), k = d.konc[+$("konc").value] || d.konc[0];
+  const w = num($("kilo").value), yas = $("yas").value.trim() === "" ? null : num($("yas").value);
+  if (!$("kilo").value.trim()) { out.innerHTML = '<div class="empty">Kiloyu girince sonuç burada görünür.</div>'; return; }
+  const bad = m => { out.innerHTML = `<div class="msg bad" style="margin:0">${m}</div>`; };
+  if (isNaN(w) || w <= 0) return bad("Geçerli bir kilo girin.");
+  if (w < 2 || w > 80) return bad("Kilo 2–80 kg dışında. Bu araç bu aralık için doz önermez.");
+  if (w < d.minKg) return bad(`${d.ad} için en az ${d.minKg} kg gerekir. Bu araç doz önermez.`);
+  if (yas !== null && (isNaN(yas) || yas < 0)) return bad("Yaşı ay olarak girin ya da boş bırakın.");
+  const minAy = Math.max(d.minAy, k.minAy || 0);
+  if (yas !== null && yas < minAy) return bad(`${d.ad} (${k.urun}) için en az ${minAy} aylık olmak gerekir. Bu araç doz önermez.`);
+
+  const notes = [];
+  let s = d.sik && d.sik[sikIdx], rawLo, rawHi;
+  if (d.bant) {
+    const v = d.tip === "yas" ? yas : w;
+    if (v === null) return bad("Bu ilaç yaşa göre dozlanır; yaşı ay olarak girin.");
+    const b = d.bant.find(b => v >= b[0] && v < b[1]);
+    if (!b) return bad("Bu değer için doz aralığı tanımlı değil; bu araç doz önermez.");
+    s = {n: b[4], saat: 24 / b[4]}; rawLo = b[2]; rawHi = b[3];
+  } else { const pd = d.doz || (k.gun || d.gun).map(x => x / s.n); rawLo = pd[0] * w; rawHi = pd[1] * w; }
+  let lo = Math.min(rawLo, d.dozMaxLo || d.dozMaxMg), hi = Math.min(rawHi, d.dozMaxMg);
+  if (rawHi > d.dozMaxMg) notes.push("Hesaplanan doz öğün başı üst sınırı aştığı için üst sınıra indirildi.");
+  let gunCap = Math.min((k.gunMaxKg || d.gunMaxKg) * w, d.gunMaxMg);
+  if (k.yasGunMax && yas !== null && yas < k.yasGunMax.ay) gunCap = Math.min(gunCap, k.yasGunMax.mgKg * w);
+  let gLo = lo * s.n, gHi = hi * s.n;
+  if (gHi > gunCap) { gHi = gunCap; hi = gunCap / s.n; lo = Math.min(lo, hi); gLo = Math.min(gLo, gHi); notes.push(`Hesaplanan doz günlük üst sınırı aştığı için üst sınıra indirildi.`); }
+  if (yas === null) notes.push("Yaş girilmedi; yaş sınırı kontrol edilmedi.");
+  if (k.n && k.n !== s.n) notes.push(`${k.urun} günde ${k.n} doz için hazırlanmıştır; sıklığı kontrol edin.`);
+
+  const ml = mg => mg * 5 / k.mg;
+  out.innerHTML = `
+    <div class="lbl">${d.ad}, ${f(w, 1)} kg</div>
+    <div class="rx">Günde ${s.n} kez · her ${s.saat} saatte bir</div>
+    <div class="big">${rng(lo, hi)} <small>mg / doz</small></div>
+    <div class="big">${rng(ml(lo), ml(hi), 1)} <small>mL / doz</small></div>
+    <dl>
+      <dt>Günlük toplam</dt><dd>${rng(gLo, gHi)} mg</dd>
+      <dt>Süre</dt><dd>${d.sure || "Hekim belirler"}</dd>
+    </dl>
+    <div class="msg warn">${d.sikNot}</div>
+    ${notes.map(n => `<div class="msg warn">${n}</div>`).join("")}
+    <div class="src">Ürün: <a href="${k.url}" target="_blank" rel="noopener">${k.urun} (${k.mg} mg / 5 mL), ${k.kaynak}</a><br>Doz: ${k.dozKaynak || d.kaynak}<br>Doğrulama: ${d.trKub ? "Türkiye KÜB/KT ile karşılaştırıldı" : "bekliyor"}</div>`;
+}
+
+$("ilac").addEventListener("change", () => { fillDrug(); hesapla(); });
+$("sik").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; sikIdx = +b.dataset.i; fillSik(); hesapla(); });
+["kilo", "yas", "konc"].forEach(id => $(id).addEventListener("input", hesapla));
+$("konc").addEventListener("change", () => { const d = ILACLAR[$("ilac").value], k = d.konc[+$("konc").value]; if (k && k.n) { const i = d.sik.findIndex(x => x.n === k.n); if (i >= 0) { sikIdx = i; fillSik(); } } hesapla(); });
+fillDrug(); hesapla();
+
+// ---- Acil IV bölümü (şuruplardan ayrı). Doğrulanmış ilaçlar buraya eklenir.
+// Şablon: {ad, endikasyon, dozMgKg:[min,max], dozMaxMg, ampul:[{mgMl, urun, url, kaynak}], seyreltme, hiz, kaynak}
+const A = (c, urun, seyreltme, url) => ({mgMl: c, urun, seyreltme, url});
+const U = {pals:"https://advancedmedicalcertification.com/lesson/pharmacological-therapy-pals-online-handbook", sz:"https://www.erc.edu/umbraco/api/download-page/download/e6600789-59bd-408a-bfd9-0145d1dcd0b9", cps:"https://cps.ca/uploads/documents/TABLE_2._Anticonvulsant_drug_therapies_for_convulsive_status_epilepticus_(CSE)_.pdf", rch:"https://www.legacyhealth.org/-/media/Files/PDF/Health-Professionals/ReferAPatient/Referral-forms/RCH_Peds-Emergency-Reference-Card_Jan-2013.pdf", ast:"https://nortonhealthcareprovider.com/wp-content/uploads/asthma-exacerbation-ed-management-1-17-yo.pdf", pf:"https://www.medicines.org.uk/emc/medicine/14288", sf:"https://sf.gov/file/emsa-protocol-812-pediatric-pain-control", ada:"https://adacounty.id.gov/paramedics/wp-content/uploads/sites/62/PM-07_-Pediatric-Pain-Control-01MAY2022.pdf", um:"https://www.umassmed.edu/globalassets/pediatrics/pediatrics-residency-program/woo-insider/logistics/pedi-dosing-card-2026-2027_final-pdf.pdf", peak:"https://media.emscimprovement.center/documents/PEAK_Status_Epilepticus_Algorithm.pdf"};
+const STD = "Standart ampul; ürün etiketini kontrol edin";
+const ILAC_IV = {
+  adrenalin_iv:{grup:"Resüsitasyon",ad:"Adrenalin IV/IO",endikasyon:"Arrest, şok",dozMgKg:[0.01,0.01],dozMaxMg:1,sik:"3–5 dakikada bir tekrarlanabilir",hiz:"Hızlı bolus, ardından SF ile yıkama",not:"Türkiye'de adrenalin ampulleri 0,25, 0,5 ve 1 mg/mL olarak bulunur. Seyrelttiğiniz ampulün gücünü etiketten kontrol edin.",url:U.pals,kaynak:"PALS: 0,01 mg/kg IV/IO (0,1 mg/mL), en fazla 1 mg",ampul:[A(0.1,"Adrenalin 1:10.000 (Türkiye'deki adrenalin ampulünden hazırlanır)","1 mg/mL ampulden: 1 mL + 9 mL SF","https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf")]},
+  atropin:{grup:"Resüsitasyon",ad:"Atropin",endikasyon:"Bradikardi",dozMgKg:[0.02,0.02],dozMinMg:0.1,dozMaxMg:0.5,sik:"Gerekirse bir kez tekrarlanabilir (3–5 dk)",hiz:"Hızlı IV/IO bolus",url:U.pals,kaynak:"PALS: 0,02 mg/kg, en az 0,1 mg, tek doz en fazla 0,5 mg",ampul:[A(0.25,"Atropin sülfat ampul ¼'lük 0,25 mg/mL (Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf"),A(0.5,"Atropin sülfat ampul ½'lik 0,5 mg/mL (Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf"),A(1,"Atropin sülfat ampul 1 mg/mL (Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf")]},
+  amiodaron:{grup:"Resüsitasyon",ad:"Amiodaron",endikasyon:"VF/nabızsız VT, taşikardi",dozMgKg:[5,5],dozMaxMg:300,sik:"Tekrarlanabilir (günlük en fazla 15 mg/kg)",hiz:"Arrestte hızlı bolus; nabızlı ritimde 20–60 dk",url:U.pals,kaynak:"PALS: 5 mg/kg IV/IO, en fazla 300 mg",ampul:[A(50,"Cordarone 150 mg/3 mL ampul (Sanofi, Türkiye)","Nabızlı ritimde %5 dekstrozla seyreltip yavaş verin","https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.LS.26%20TEMEL%20%C4%B0LA%C3%87%20VE%20SERUM%20L%C4%B0STES%C4%B0_1711091010177082.pdf")]},
+  adenozin:{grup:"Resüsitasyon",ad:"Adenozin",endikasyon:"SVT",dozMgKg:[0.1,0.1],dozMaxMg:6,sik:"2. doz 0,2 mg/kg (en fazla 12 mg)",hiz:"Çok hızlı IV bolus, hemen SF ile yıkama",url:U.pals,kaynak:"PALS: ilk doz 0,1 mg/kg, en fazla 6 mg",ampul:[A(3,"Adozin 6 mg/2 mL ampul (VEM, Türkiye)",undefined,"https://ilacabak.com/adozin-6-mg-2-ml-i-v-enjeksiyonluk-cozelti-iceren-ampul-1-ampul-16651"),A(3,"Adenotek 6 mg/2 mL ampul (Farma-Tek, Türkiye)",undefined,"https://ilacabak.com/adenotek-6-mg-2ml-iv-enj-inf-icin-coz-iceren-1-ampul-18417"),A(5,"Adenosin-L.M. 5 mg/mL ampul (Abfen, Türkiye)",undefined,"https://www.ilacrehberi.com/v/adenotek-6-mg2ml-iv-enjinf-icin-coz-iceren-1-ampu-f434/esdegerleri/")]},
+  bikarbonat:{grup:"Resüsitasyon",ad:"Sodyum bikarbonat",endikasyon:"Metabolik asidoz, hiperkalemi",u:"mEq",dozMgKg:[1,1],dozMaxMg:50,sik:"Hekim belirler",hiz:"Yavaş bolus; ventilasyon sağlandıktan sonra",not:"Hiperozmolardır. Kalsiyum ile karışmaz.",url:U.pals,kaynak:"PALS: 1 mEq/kg yavaş bolus, en fazla 50 mEq",ampul:[A(1,"Sodyum bikarbonat %8,4 (1 mEq/mL)"),A(0.5,"Sodyum bikarbonat %4,2 (0,5 mEq/mL)")]},
+  dekstroz:{grup:"Resüsitasyon",ad:"Dekstroz",endikasyon:"Hipoglisemi",u:"g",dozMgKg:[0.5,1],dozMaxMg:25,sik:"Kan şekerine göre",hiz:"IV/IO bolus",url:U.pals,kaynak:"PALS: 0,5–1 g/kg (%10: 5–10 mL/kg, %25: 2–4 mL/kg)",ampul:[A(0.1,"Dekstroz %10"),A(0.25,"Dekstroz %25","%50 dekstrozu eşit hacim SF ile seyreltin")]},
+  magnezyum:{grup:"Solunum ve alerji",ad:"Magnezyum sülfat",endikasyon:"Ağır astım",dozMgKg:[25,50],dozMaxMg:2000,sik:"Tek doz",hiz:"15–30 dk infüzyon",url:U.rch,kaynak:"PALS/RCH: 25–50 mg/kg, en fazla 2 g",ampul:[A(150,"Magnezyum sülfat %15 ("+STD+")","Seyreltip infüzyonla verin"),A(500,"Magnezyum sülfat %50","Mutlaka seyreltin")]},
+  adrenalin_im:{grup:"Solunum ve alerji",ad:"Adrenalin IM",endikasyon:"Anafilaksi",dozMgKg:[0.01,0.01],dozMaxMg:0.3,sik:"5–15 dk arayla tekrarlanabilir",hiz:"Uyluk dış yüz, IM",not:"Bazı protokollerde tek doz sınırı 0,5 mg (adolesan).",url:U.rch,kaynak:"PALS/RCH: 0,01 mg/kg (0,01 mL/kg), tek doz en fazla 0,3 mg",ampul:[A(1,"Adrenalin ampul 1 mg/mL (1:1000, Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf"),A(0.5,"Adrenalin ampul ½'lik 0,5 mg/mL (Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf"),A(0.25,"Adrenalin ampul ¼'lük 0,25 mg/mL (Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf")]},
+  deksametazon:{grup:"Solunum ve alerji",ad:"Deksametazon",endikasyon:"Astım, krup",dozMgKg:[0.6,0.6],dozMaxMg:16,sik:"Astımda 24 saat sonra 2. doz",hiz:"IV/IM",url:U.ast,kaynak:"0,6 mg/kg, en fazla 16 mg",ampul:[A(4,"Deksamet 8 mg ampul (8 mg/2 mL varsayımı, hastane listesi, Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.LS.26%20TEMEL%20%C4%B0LA%C3%87%20VE%20SERUM%20L%C4%B0STES%C4%B0_1711091010177082.pdf")]},
+  metilprednizolon:{grup:"Solunum ve alerji",ad:"Metilprednizolon",endikasyon:"Astım, anafilaksi",dozMgKg:[1,2],dozMaxMg:60,sik:"Hekim belirler",hiz:"IV/IM",url:U.rch,kaynak:"RCH: 1–2 mg/kg, tek doz en fazla 60 mg",not:"IV için yalnızca sodyum süksinat tuzu kullanılır; asetat (depo) flakon IM içindir.",ampul:[A(40,"Metilprednizolon sodyum süksinat 40 mg flakon (Türkiye ürün adı doğrulanmadı)","1 mL çözücü ile 40 mg/mL")]},
+  midazolam:{grup:"Nöbet",ad:"Midazolam IV/IO",endikasyon:"Status epileptikus",dozMgKg:[0.1,0.2],dozMaxMg:10,sik:"5 dk sonra bir kez tekrarlanabilir",hiz:"Yavaş IV/IO",konsUyari:{kg:15,mgMl:1,metin:"15 kg altı çocuklarda 1 mg/mL'den yüksek konsantrasyon önerilmez; 1 mg/mL'ye seyreltin (Dormicum KÜB)."},not:"Solunum depresyonuna hazırlıklı olun. Kaynaklarda IV doz 0,1–0,2 mg/kg arasında değişiyor.",url:U.cps,kaynak:"CPS/PEAK/ERC: 0,1–0,2 mg/kg, en fazla 10 mg",ampul:[A(1,"Dormicum 5 mg/5 mL ampul (Deva, Türkiye)",undefined,"https://deva.com.tr/uploads/product_files/05072013135443.pdf"),A(5,"Demizolam 15 mg ampul (3 mL varsayımı, Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.LS.26%20TEMEL%20%C4%B0LA%C3%87%20VE%20SERUM%20L%C4%B0STES%C4%B0_1711091010177082.pdf")]},
+  diazepam:{grup:"Nöbet",ad:"Diazepam IV",endikasyon:"Status epileptikus",dozMgKg:[0.2,0.3],dozMaxMg:10,sik:"Bir kez tekrarlanabilir",hiz:"Yavaş IV",maxYas:[[0,60,5],[60,100000,10]],not:"5 yaş altında tek doz en fazla 5 mg, 5 yaş ve üzerinde en fazla 10 mg (CPS, Diazem KÜB).",url:U.cps,kaynak:"CPS/UnityPoint: 0,2–0,3 mg/kg, en fazla 10 mg",ampul:[A(5,"Diazem 10 mg/2 mL ampul (Deva, Türkiye)",undefined,"https://ilacabak.com/diazem-10-mg-2-ml-i-m-i-v-enjeksiyonluk-cozelti-iceren-ampul-10-ampul-1886")]},
+  fenitoin:{grup:"Nöbet",ad:"Fenitoin",endikasyon:"Status epileptikus (2. basamak)",dozMgKg:[20,20],dozMaxMg:1000,sik:"Tek yükleme dozu",hiz:"1 mg/kg/dk (en fazla 1 mL = 50 mg/dk), yaklaşık 20 dk",not:"EKG ve tansiyon izlenir. Yalnızca SF ile seyreltin, başka ilaçlarla karıştırmayın (Epitoin KÜB).",url:U.cps,kaynak:"CPS/PEAK: 20 mg/kg, en fazla 1000 mg",ampul:[A(50,"Epitoin 250 mg/5 mL ampul (VEM, Türkiye)","SF ile seyreltin; son konsantrasyon en fazla 10 mg/mL","https://titck.gov.tr/storage/Archive/2021/kubKtAttachments/EPTON250mg5mlI.M.I.V.EnjeksiyonlukzeltierenAmpulKB_79fa2423-051d-4288-8197-f907aefae49a.pdf")]},
+  levetirasetam:{grup:"Nöbet",ad:"Levetirasetam",endikasyon:"Status epileptikus (2. basamak)",dozMgKg:[40,60],dozMaxMg:3000,sik:"Tek yükleme dozu",hiz:"Seyreltip yaklaşık 5 dk",not:"Bazı protokollerde en fazla 4500 mg.",yasUyari:{ay:48,metin:"Keppra infüzyon KÜB'ünde 4 yaş altı için ayrı bir bölüm bulunur; kullanmadan önce KÜB'ü kontrol edin."},url:U.sz,kaynak:"ERC/PEAK: 40–60 mg/kg, en fazla 3000 mg",ampul:[A(100,"Keppra 500 mg/5 mL konsantre infüzyon flakonu (Türkiye)","Seyreltip verin","https://titck.gov.tr/storage/Archive/2021/kubKtAttachments/500flkkub_25471439-87d0-48eb-8bd4-91c202ab8e44.pdf")]},
+  parasetamol_a:{grup:"Ağrı ve bulantı",ad:"Parasetamol IV (10 kg ve altı)",kiloAralik:[0,10],dozMgKg:[7.5,7.5],dozMaxMg:75,sik:"Günde en fazla 4 kez; günlük en fazla 30 mg/kg",hiz:"15 dk infüzyon",not:"mg ile mL karışıklığı 10 kat doz aşımına yol açmıştır: ampul 10 mg/mL.",url:U.pf,kaynak:"Perfalgan SmPC: ≤10 kg 7,5 mg/kg",ampul:[A(10,"A-Per 10 mg/mL IV infüzyonluk çözelti (Türkiye)",undefined,"https://www.ilacabak.com/a-per-10-mg-ml-i-v-infuzyonluk-cozelti-12-flakon-27619/benzerleri")]},
+  parasetamol_b:{grup:"Ağrı ve bulantı",ad:"Parasetamol IV (10–50 kg)",kiloAralik:[10,50],dozMgKg:[15,15],dozMaxMg:750,sik:"Günde en fazla 4 kez; günlük en fazla 60 mg/kg (≤33 kg: en fazla 2 g, 33–50 kg: en fazla 3 g)",hiz:"15 dk infüzyon",not:"mg ile mL karışıklığı 10 kat doz aşımına yol açmıştır: ampul 10 mg/mL.",url:U.pf,kaynak:"Perfalgan SmPC: >10–50 kg 15 mg/kg",ampul:[A(10,"A-Per 10 mg/mL IV infüzyonluk çözelti (Türkiye)",undefined,"https://www.ilacabak.com/a-per-10-mg-ml-i-v-infuzyonluk-cozelti-12-flakon-27619/benzerleri")]},
+  ondansetron_iv:{grup:"Ağrı ve bulantı",ad:"Ondansetron IV",endikasyon:"Bulantı, kusma",dozMgKg:[0.1,0.1],dozMaxMg:4,sik:"Hekim belirler",hiz:"2–5 dk'da yavaş IV",minAy:6,minAyKaynak:"SF EMS protokolü: 6 ay–12 yaş için 0,1 mg/kg",url:U.sf,kaynak:"SF EMS: 0,1 mg/kg, en fazla 4 mg",ampul:[A(2,"Zofran 4 mg/2 mL ampul (Sandoz, Türkiye)",undefined,"https://www.ilacabak.com/zofran-4-mg-2-ml-1-ampul-24152"),A(2,"Zofran 8 mg/4 mL ampul (Sandoz, Türkiye)",undefined,"https://www.ilacabak.com/zofran-8-mg-4-ml-1-ampul-24156")]},
+  morfin:{grup:"Ağrı ve bulantı",ad:"Morfin IV",endikasyon:"Şiddetli ağrı",dozMgKg:[0.1,0.1],dozMaxMg:4,sik:"Kaynağa göre 10–15 dk sonra yarı doz tekrarlanabilir",hiz:"Yavaş IV",not:"Solunum depresyonu: monitorize edin, naloksan hazır tutun.",url:U.ada,kaynak:"0,1 mg/kg IV, ilk doz en fazla 4–5 mg",ampul:[A(10,"Morfin 10 mg/mL ("+STD+")","1 mg/mL'ye seyreltin: 1 mL + 9 mL SF")]},
+  fentanil:{grup:"Ağrı ve bulantı",ad:"Fentanil IV",endikasyon:"Şiddetli ağrı",u:"mcg",dozMgKg:[1,1],dozMaxMg:50,sik:"0,5 mcg/kg tekrar (en fazla 25 mcg); toplam en fazla 100 mcg",hiz:"1 dk'da yavaş IV",not:"Solunum depresyonu: monitorize edin.",url:U.sf,kaynak:"SF EMS: 1 mcg/kg, en fazla 50 mcg",ampul:[A(50,"Fentanil sitrat 0,05 mg/mL ampul (10 mL, hastane listesi, Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.LS.26%20TEMEL%20%C4%B0LA%C3%87%20VE%20SERUM%20L%C4%B0STES%C4%B0_1711091010177082.pdf")]},
+  ketamin_agri:{grup:"Ağrı ve bulantı",ad:"Ketamin IV (ağrı)",endikasyon:"Subdissosiyatif analjezi",dozMgKg:[0.2,0.3],dozMaxMg:30,sik:"Hekim belirler",hiz:"1 dk'da yavaş IV",minAy:12,minAyKaynak:"Ada County pediatrik ağrı protokolü: 1 yaş altında kullanılmaz",url:U.ada,kaynak:"0,2–0,3 mg/kg IV, en fazla 30 mg",ampul:[A(50,"Ketalar 500 mg/10 mL flakon (Pfizer, Türkiye)","Seyreltip verin","https://titck.gov.tr/storage/Archive/2020/kubKtAttachments/TITCKKETALARUYGUNKB_6d449000-92af-4327-a5f9-08c222a0517f.pdf")]},
+  ketamin_sed:{grup:"Ağrı ve bulantı",trKub:true,ad:"Ketamin IV (sedasyon/indüksiyon)",endikasyon:"Sedasyon, anestezi indüksiyonu",dozMgKg:[1,2],dozMaxMg:null,sik:"Sonrasında 0,5 mg/kg her 5–15 dk (kaynağa göre)",hiz:"Yavaş IV",not:"Yalnızca havayolu yönetimi bilen ekip kullanmalıdır.",url:U.um,kaynak:"UMass: 1–2 mg/kg IV; Ketalar KÜB: IV başlangıç 1–4,5 mg/kg (ortalama 2 mg/kg)",ampul:[A(50,"Ketalar 500 mg/10 mL flakon (Pfizer, Türkiye)","https://titck.gov.tr/storage/Archive/2020/kubKtAttachments/TITCKKETALARUYGUNKB_6d449000-92af-4327-a5f9-08c222a0517f.pdf")]}
+};
+function sekme(n) {
+  $("oral").hidden = n !== "oral"; $("iv").hidden = n !== "iv";
+  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === n));
+}
+$("tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) sekme(b.dataset.t); });
+function ivFillIlac() {
+  const k = Object.keys(ILAC_IV), g = {};
+  k.forEach(x => (g[ILAC_IV[x].grup] = g[ILAC_IV[x].grup] || []).push(x));
+  $("ivilac").innerHTML = k.length ? Object.entries(g).map(([n, l]) => `<optgroup label="${n}">${l.map(x => `<option value="${x}">${ILAC_IV[x].ad}</option>`).join("")}</optgroup>`).join("") : '<option value="">Henüz ilaç eklenmedi</option>';
+  ivFillAmpul();
+}
+function ivFillAmpul() {
+  const d = ILAC_IV[$("ivilac").value];
+  $("ivampul").innerHTML = d ? d.ampul.map((a, i) => `<option value="${i}">${f(a.mgMl, 2)} ${d.u || "mg"}/mL · ${a.urun}</option>`).join("") : '<option value="">-</option>';
+  ivHesapla();
+}
+function ivHesapla() {
+  const out = $("ivsonuc"), d = ILAC_IV[$("ivilac").value];
+  if (!d) { out.innerHTML = '<div class="empty">Bu bölüm hazır. Kaynakla doğrulanmış acil ilaçlar eklendikçe burada görünecek.</div>'; return; }
+  if (!$("kiloIv").value.trim()) { out.innerHTML = '<div class="empty">Kiloyu girince sonuç burada görünür.</div>'; return; }
+  const w = num($("kiloIv").value), bad = m => { out.innerHTML = `<div class="msg bad" style="margin:0">${m}</div>`; };
+  if (isNaN(w) || w < 1 || w > 80) return bad("Kilo 1–80 kg aralığında olmalı. Bu araç bu aralık dışında doz önermez.");
+  const yas = $("yasIv").value.trim() === "" ? null : num($("yasIv").value);
+  if (yas !== null && (isNaN(yas) || yas < 0)) return bad("Yaşı ay olarak girin ya da boş bırakın.");
+  if (d.minAy && yas !== null && yas < d.minAy) return bad(`${d.ad} ${d.minAy} aylıktan küçük çocuklarda önerilmez (${d.minAyKaynak}). Bu araç doz önermez.`);
+  if (d.kiloAralik && !(w > d.kiloAralik[0] && w <= d.kiloAralik[1])) return bad(`${d.ad} yalnızca ${d.kiloAralik[0]}–${d.kiloAralik[1]} kg arası içindir. Listeden kilonuza uygun seçeneği seçin.`);
+  const a = d.ampul[+$("ivampul").value], u = d.u || "mg", notes = [];
+  let lo = d.dozMgKg[0] * w, hi = d.dozMgKg[1] * w, dmax = d.dozMaxMg;
+  if (d.maxYas) { const m = d.maxYas.find(x => yas !== null && yas >= x[0] && yas < x[1]); dmax = m ? m[2] : d.maxYas[0][2]; if (yas === null) notes.push(`Yaş girilmedi; en düşük üst sınır (${f(dmax, 2)} ${u}) uygulandı.`); }
+  else if ((d.minAy || d.yasUyari) && yas === null) notes.push("Yaş girilmedi; yaş sınırı kontrol edilmedi.");
+  if (d.yasUyari && yas !== null && yas < d.yasUyari.ay) notes.push(d.yasUyari.metin);
+  if (d.konsUyari && w < d.konsUyari.kg && a.mgMl > d.konsUyari.mgMl) notes.push(d.konsUyari.metin);
+  if (d.dozMinMg && lo < d.dozMinMg) { lo = Math.max(lo, d.dozMinMg); hi = Math.max(hi, d.dozMinMg); notes.push(`Hesaplanan doz alt sınırın (${f(d.dozMinMg, 2)} ${u}) altında kaldığı için alt sınıra çıkarıldı.`); }
+  if (dmax && hi > dmax) { hi = dmax; lo = Math.min(lo, hi); notes.push(`Hesaplanan doz üst sınırı (${f(dmax, 2)} ${u}) aştığı için sınıra indirildi.`); }
+  const dec = u === "mcg" ? 0 : 2, sey = a.seyreltme || d.seyreltme;
+  out.innerHTML = `
+    <div class="lbl">${d.ad}, ${f(w, 1)} kg${yas !== null ? ", " + f(yas, 0) + " ay" : ""}${d.endikasyon ? " · " + d.endikasyon : ""}</div>
+    <div class="big">${rng(lo, hi, dec)} <small>${u}</small></div>
+    <div class="big">${rng(lo / a.mgMl, hi / a.mgMl, 2)} <small>mL (${f(a.mgMl, 2)} ${u}/mL)</small></div>
+    <dl><dt>Tekrar</dt><dd>${d.sik || "-"}</dd><dt>Veriliş</dt><dd>${d.hiz || "-"}</dd>${sey ? `<dt>Seyreltme</dt><dd>${sey}</dd>` : ""}</dl>
+    ${d.not ? `<div class="msg warn">${d.not}</div>` : ""}
+    ${notes.map(n => `<div class="msg warn">${n}</div>`).join("")}
+    <div class="src">Ampul: ${a.url ? `<a href="${a.url}" target="_blank" rel="noopener">${a.urun}</a>` : a.urun}<br>Doz: <a href="${d.url}" target="_blank" rel="noopener">${d.kaynak}</a><br>Doğrulama: ${d.trKub ? "Türkiye KÜB aralığıyla uyumlu" : "bekliyor"}. Ampul konsantrasyonunu elinizdeki ürünün etiketinden kontrol edin.</div>`;
+}
+$("ivilac").addEventListener("change", ivFillAmpul);
+$("ivampul").addEventListener("change", ivHesapla);
+$("kiloIv").addEventListener("input", ivHesapla);
+$("yasIv").addEventListener("input", ivHesapla);
+ivFillIlac();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
