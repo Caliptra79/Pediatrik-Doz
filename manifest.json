@@ -1,7 +1,7 @@
 {
   "id": "./",
   "name": "Pediatrik Doz Hesaplayıcı",
-  "short_name": "Pediatrik Doz",
+  "short_name": "Pediatrik Doz Hesaplayıcı",
   "description": "Pediatrik oral ve acil IV doz hesaplayıcı",
   "lang": "tr-TR",
   "start_url": "./",
