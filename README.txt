@@ -26,52 +26,6 @@ UYGULAMANIN ÖZELLİKLERİ
 • Uygulamanın telefona uygulama gibi ana ekrana eklenebilmesi
 
 
-İLAÇLAR
---------
-
-Uygulamada pediatrik kullanımda sık karşılaşılan farklı ilaç grupları bulunmaktadır.
-
-Oral bölümde örnek olarak:
-
-• Parasetamol
-• İbuprofen
-• Amoksisilin-klavulanat
-• Azitromisin
-• Klaritromisin
-• Sefiksim
-• Sefuroksim
-• Setirizin
-• Desloratadin
-• Ondansetron
-• Metronidazol
-
-ve diğer pediatrik ilaçlar yer almaktadır.
-
-Acil IV bölümünde ise örnek olarak:
-
-• Adrenalin
-• Atropin
-• Amiodaron
-• Adenozin
-• Sodyum bikarbonat
-• Dekstroz
-• Magnezyum sülfat
-• Adrenalin IM
-• Deksametazon
-• Metilprednizolon
-• Midazolam
-• Diazepam
-• Fenitoin
-• Levetirasetam
-• IV parasetamol
-• Ondansetron IV
-• Morfin
-• Fentanil
-• Ketamin
-
-gibi acil durumda kullanılabilen ilaçlar bulunmaktadır.
-
-
 KULLANIM
 --------
 
