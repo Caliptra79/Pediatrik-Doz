@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pediatrik Doz Hesaplayıcı</title>
+<meta name="theme-color" id="tc" content="#f1f4f8">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="description" content="Pediatrik oral, acil IV/IM ve zehirlenme doz hesaplayıcı (hekim onayı gerektirir).">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Doz Hesaplayıcı">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f1f4f8;--card:#fff;--ink:#1a2430;--mute:#586374;--line:#e4e9f0;--accent:#2f5f98;--accent-ink:#fff;--warn-bg:#fdf3e0;--warn:#7a4d00;--bad-bg:#fdecea;--bad:#a4271c;--iv:#2f5f98;--iv-bg:#e5eef8;--zh:#b45309;--zh-bg:#fdf0e3;--ok-bg:#e5eef8;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1622;--card:#162131;--ink:#e6edf6;--mute:#9fadc0;--line:#26364b;--accent:#7fb0e8;--accent-ink:#0e1622;--warn-bg:#3a2f17;--warn:#f2cd85;--bad-bg:#3b1815;--bad:#ff9d93;--iv:#7fb0e8;--iv-bg:#1f3a5a;--zh:#f0a35c;--zh-bg:#3a2a18;--ok-bg:#1f3a5a}}
+:root[data-theme="dark"]{--bg:#0e1622;--card:#162131;--ink:#e6edf6;--mute:#9fadc0;--line:#26364b;--accent:#7fb0e8;--accent-ink:#0e1622;--warn-bg:#3a2f17;--warn:#f2cd85;--bad-bg:#3b1815;--bad:#ff9d93;--iv:#7fb0e8;--iv-bg:#1f3a5a;--zh:#f0a35c;--zh-bg:#3a2a18;--ok-bg:#1f3a5a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:520px;margin:0 auto;padding:20px 16px 90px}
+h1{font-size:1.35rem;margin:0 0 4px;letter-spacing:-.01em}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.tg{flex:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.tg:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sub{color:var(--mute);margin:0 0 16px;font-size:.92rem}
+.note{background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:.86rem;margin-bottom:16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 1px 2px rgba(20,40,70,.06)}
+label{display:block;font-size:.88rem;font-weight:600;margin:12px 0 4px}
+label:first-child{margin-top:0}
+select,input{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px}
+select:focus,input:focus{outline:3px solid var(--accent);outline-offset:1px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:.78rem;color:var(--mute);margin-top:4px}
+.big{font-size:2rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1.15}
+.big small{font-size:1rem;font-weight:500;color:var(--mute)}
+.lbl{font-size:.82rem;color:var(--mute)}
+dl{margin:14px 0 0;display:grid;grid-template-columns:auto 1fr;gap:8px 14px}
+dt{color:var(--mute);font-size:.88rem}
+dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.msg{border-radius:10px;padding:10px 12px;font-size:.88rem;margin-top:12px}
+.msg.warn{background:var(--warn-bg);color:var(--warn)}
+.msg.bad{background:var(--bad-bg);color:var(--bad);font-weight:600}
+.src{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:.8rem;color:var(--mute)}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;font:inherit;font-weight:600;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 8px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.rx{display:inline-block;background:var(--ok-bg);color:var(--accent);font-weight:700;border-radius:8px;padding:4px 10px;margin:6px 0 8px;font-size:.95rem}
+.src a{color:var(--accent)}
+[hidden]{display:none!important}
+.ivb{background:var(--iv-bg);color:var(--iv);border-radius:10px;padding:8px 12px;font-size:.84rem;margin-bottom:14px}
+.zhb{background:var(--zh-bg);color:var(--zh);border-radius:10px;padding:10px 12px;font-size:.86rem;margin-bottom:14px}
+.ivp{border-color:var(--iv)}
+.zhp{border-color:var(--zh)}
+.sl{margin-top:2px}
+.slh{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.slv{font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums}
+.slv.off{color:var(--mute);font-weight:500;font-size:1rem}
+.slb{display:flex;gap:6px}
+.slb button{font:inherit;font-weight:600;min-width:44px;height:36px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;cursor:pointer;padding:0 10px}
+.slb button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sl input[type=range]{width:100%;padding:0;border:0;background:transparent;height:38px;accent-color:var(--accent)}
+.slr{display:flex;justify-content:space-between;font-size:.75rem;color:var(--mute)}
+.zt{border-top:1px solid var(--line);padding:12px 0 4px}
+.zt:first-of-type{border-top:0}
+.zt b{font-size:1rem}
+.zt .zd{font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin:2px 0}
+.zt .zm{font-size:.86rem;color:var(--mute);margin:2px 0}
+.zt ul,.zl{margin:6px 0 0;padding-left:18px;font-size:.9rem}
+.zh-tel{display:inline-block;margin-top:6px;background:var(--bad);color:var(--card);font-weight:700;border-radius:10px;padding:8px 16px;text-decoration:none}
+a:not(.zh-tel){color:var(--accent)}
+details.nt{background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:8px 12px;font-size:.84rem;margin-bottom:14px}
+details.nt summary{cursor:pointer;font-weight:600}
+details.nt p{margin:6px 0 2px}
+.uy{background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:.88rem}
+.uy.kr{background:var(--bad-bg);color:var(--bad)}
+.uy ul{margin:4px 0 0;padding-left:18px}
+.uy li{margin:3px 0}
+.uy li.k{font-weight:700}
+.bd{display:inline-block;font-size:.72rem;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--line);color:var(--ink)}
+.bd.ok{background:#d6f0e0;color:#14532d}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bd.ok{background:#14532d;color:#d6f0e0}}
+:root[data-theme="dark"] .bd.ok{background:#14532d;color:#d6f0e0}
+details.kv{margin-top:14px;padding-top:10px;border-top:1px solid var(--line);font-size:.8rem;color:var(--mute)}
+details.kv summary{cursor:pointer;font-weight:600}
+.kvi{margin-top:8px;line-height:1.5}
+.fdc{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.fdc button{font:inherit;font-size:.8rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 11px;cursor:pointer}
+#ozet{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);background:var(--accent);color:var(--accent-ink);border-radius:12px;padding:10px 14px;font-weight:600;font-size:.92rem;box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:20;cursor:pointer;text-align:center}
+.btn{margin-top:12px;font:inherit;font-weight:600;font-size:.85rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer}
+#hastaOzet{position:sticky;top:env(safe-area-inset-top,0px);z-index:15;display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.12);font-weight:700}
+#hastaOzet .btn{margin-top:0}
+.eb{margin-top:12px;font-size:.7rem;color:var(--mute);line-height:1.45}
+.empty{color:var(--mute);text-align:center;padding:8px 0}
+footer{font-size:.78rem;color:var(--mute);text-align:center;margin-top:30px}
+.tarih,.soz,.kim{font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;font-style:italic;color:var(--ink)}
+.tarih{font-size:1.4rem;font-weight:600;margin:6px 0 16px}
+.soz{font-size:1.2rem;font-weight:600;line-height:1.35;margin:0 auto;max-width:300px}
+#imza{margin:10px auto 0;min-height:0}
+#imza img{height:64px;width:auto;max-width:240px;opacity:.92}
+html[data-theme="dark"] #imza img{filter:invert(1)}
+@media (prefers-color-scheme:dark){html:not([data-theme="light"]) #imza img{filter:invert(1)}}
+.kim{font-size:1rem;font-weight:500;margin-top:6px;color:var(--mute)}
+</style>
+</head>
+<body>
+<main>
+<div class="hd"><h1>Pediatrik Doz Hesaplayıcı</h1><button type="button" class="tg" id="tema" aria-label="Koyu temaya geç" title="Tema"></button></div>
+<p class="sub">İlacı ve kiloyu girin; günlük doz, öğün başı doz ve sıklık hesaplansın.</p>
+<div class="seg" id="tabs" role="group" aria-label="Bölüm" style="margin-bottom:16px">
+<button type="button" data-t="oral" aria-pressed="true">Oral</button>
+<button type="button" data-t="iv" aria-pressed="false">Acil &amp; IV &amp; IM</button>
+<button type="button" data-t="zh" aria-pressed="false">Zehirlenme</button>
+</div>
+<details class="nt"><summary>ⓘ Ön Sürüm · Hekim Onayı Gerekir</summary><p>Doz değerleri Türkiye KÜB/KT veya yurt dışı protokollerden alınmıştır; doğrulama durumu her sonuçta yazar. Klinik kullanımdan önce çocuk hekimi veya eczacı onayından geçirin.</p></details>
+
+<div id="hastaOzet" hidden><span id="hastaTxt"></span><button type="button" class="btn" id="hastaDegistir">Değiştir</button></div>
+<section class="panel" id="hasta">
+<label>Kilo</label>
+<div class="sl" data-id="kilo" data-kind="kilo" data-min="1" data-max="80" data-step="0.5" data-fine="0.1" data-start="10" data-lo="1 kg" data-hi="80 kg"></div>
+<label>Yaş</label>
+<div class="sl" data-id="yas" data-kind="yas" data-min="0" data-max="216" data-step="1" data-fine="1" data-start="12" data-lo="0 ay" data-hi="18 yaş"></div>
+<button type="button" class="btn" id="kiloTahmin">Kiloyu Yaştan Tahmin Et</button>
+<div class="zm" id="kiloTahminNot"></div>
+<button type="button" class="btn" id="hastaTamam" hidden style="margin-left:8px">Tamam</button>
+<div hidden><input type="hidden" id="kiloIv"><input type="hidden" id="yasIv"><input type="hidden" id="kiloZh"><input type="hidden" id="yasZh"></div>
+</section>
+<div id="oral">
+<section class="panel">
+<label for="ilac">İlaç</label>
+<select id="ilac"></select>
+<label for="konc">Ürün</label>
+<select id="konc"></select>
+<div id="endikW" hidden><label for="endik">Endikasyon</label><select id="endik"></select></div>
+<label id="siklbl">Sıklık</label>
+<div class="seg" id="sik" role="group" aria-labelledby="siklbl"></div>
+</section>
+
+<section class="panel" id="sonuc" aria-live="polite"></section>
+</div>
+<div id="iv" hidden>
+<div class="ivb">Ampul gücünü, seyreltmeyi ve veriliş hızını her seferinde kontrol edin.</div>
+<section class="panel ivp">
+<label for="ivilac">İlaç</label>
+<select id="ivilac"></select>
+<div id="ivendikW" hidden><label for="ivendik">Endikasyon</label><select id="ivendik"></select></div>
+<label for="ivampul">Ürün</label>
+<select id="ivampul"></select>
+<div id="ivsikW" hidden><label for="ivsik">Sıklık</label><select id="ivsik"></select></div>
+</section>
+<section class="panel ivp" id="ivsonuc" aria-live="polite"></section>
+</div>
+<div id="zh" hidden>
+<div class="zhb"><b>Önce 114'ü arayın (Zehir Danışma, 24 saat).</b> Madde, miktar, alım saati, kilo ve yaşı hazır tutun. Karar desteğidir; antidot ve dekontaminasyon kararını hekim verir.<br><a class="zh-tel" href="tel:114">114'ü ara</a></div>
+<section class="panel zhp">
+<label for="zhilac">Zehirlenme Durumu</label>
+<select id="zhilac"></select>
+<div id="zhmikW" hidden><label for="zhmik" id="zhmiklbl">Alınan Miktar (mg)</label><input id="zhmik" inputmode="decimal" placeholder="isteğe bağlı" autocomplete="off"></div>
+</section>
+<section class="panel zhp" id="zhsonuc" aria-live="polite"></section>
+</div>
+<footer>
+<div>Son karar hekime aittir.</div>
+<div class="tarih" id="tarih"></div>
+<blockquote class="soz" style="margin:0 auto">“Beni Türk hekimlerine emanet ediniz.”</blockquote>
+<div id="imza"></div>
+<div class="kim" id="kim">Mustafa Kemal Atatürk</div>
+</footer>
+<div id="ozet" hidden></div>
+</main>
+<script>
+// Doz tablosu: değerleri onaylı kaynaktan güncelleyin. Ürün/konsantrasyon bilgileri bağlantılı kaynaklardan alındı; doz aralıkları henüz KÜB ile doğrulanmadı.
+const ILACLAR = {
+  parasetamol:{grup:"Ateş ve ağrı",trKub:true,ad:"Parasetamol",doz:[10,15],gunMaxKg:60,gunMaxMg:2000,dozMaxMg:500,minAy:3,minKg:4,
+    sik:[{n:4,saat:6},{n:3,saat:8}],sikNot:"En az 4 saat ara verin; 24 saatte en fazla 4 doz.",
+    konc:[{mg:120,urun:"Calpol Süspansiyon (Türkiye)",kaynak:"TİTCK listesi",url:"https://www.ilacabak.com/calpol-120-mg-150-ml-suspansiyon-2985"},
+          {mg:250,urun:"Calpol 6 Plus Süspansiyon (Türkiye)",minAy:72,kaynak:"TİTCK listesi",url:"https://www.ilacabak.com/calpol-6-plus-250-mg-5-ml-150-ml-surup-2987"}],
+    kaynak:"10–15 mg/kg/doz, günlük en fazla 60 mg/kg; 30 kg üstü tek doz 500 mg, günlük 2 g (Calpol KT, Tylol KÜB)"},
+  ibuprofen:{grup:"Ateş ve ağrı",trKub:true,ad:"İbuprofen",gun:[20,30],gunMaxKg:30,gunMaxMg:1200,dozMaxMg:400,minAy:6,minKg:7,
+    sik:[{n:3,saat:8},{n:4,saat:6}],sikNot:"KÜB: günlük doz 20–30 mg/kg, 3–4 doza bölünür (en fazla 6 saatte bir). Juvenil artritte 40 mg/kg/güne kadar çıkılabilir (bu araç hesaplamaz).",
+    konc:[{mg:100,urun:"Dolven Pediyatrik Şurup",kaynak:"TİTCK KT",url:"https://titck.gov.tr/storage/Archive/2021/kubKtAttachments/yaynlanacakktdolvenurup_fc28d4d8-84c2-44ec-8973-11751b18ae15.pdf"},
+          {mg:100,urun:"Pedifen Pediatrik Şurup",kaynak:"TİTCK KT",url:"https://titck.gov.tr/storage/kubKtAttachments/bd256e8a19750.pdf"}],
+    kaynak:"20–30 mg/kg/gün, 3–4 doz; 6 ay ve 7 kg alt sınırı (Dolven, Pedifen TİTCK KÜB)"},
+  amoksisilin:{aile:"pen",bobrek:"uyari",grup:"Antibiyotikler",endik:[{ad:"Diğer enfeksiyonlar (25–45 mg/kg/gün)",gun:[25,45]},{ad:"Otitis media, sinüzit, alt solunum yolu (70 mg/kg/güne kadar)",gun:[25,70]}],trKub:true,sure:"Hekim belirler; hekim değerlendirmesi olmadan 14 günü aşmamalı (KÜB)",ad:"Amoksisilin-klavulanat",gun:[40,90],gunMaxKg:70,gunMaxMg:2800,dozMaxMg:1400,minAy:1,minKg:3,
+    sik:[{n:2,saat:12},{n:3,saat:8}],sikNot:"Augmentin BID formları günde 2 doz (12 saatte bir) içindir. Penisilin alerjisinde kullanılmaz.",
+    konc:[{mg:200,urun:"Augmentin BID 200/28,5 süspansiyon (GSK, Türkiye)",n:2,gun:[25,70],gunMaxKg:70,minAy:2,yasGunMax:{ay:24,mgKg:45},kaynak:"TİTCK KÜB",dozKaynak:"Augmentin BID KÜB (Türkiye): amoksisilin 25–45 mg/kg/gün, otit/sinüzit/alt solunum yolunda 70 mg/kg/gün'e kadar, 2 doza bölünmüş; 2 yaş altında 45 mg/kg/gün üstü için veri yok; 2 aydan küçükte doz önerilmez",url:"https://cdn.ilacrehberi.com/augmentinbid-200-mg-28mg-oral-sspansiyon-hazrlama-a922-kub.pdf"},
+          {mg:400,urun:"Augmentin BID 400/57 süspansiyon (GSK, Türkiye)",n:2,gun:[25,70],gunMaxKg:70,minAy:2,yasGunMax:{ay:24,mgKg:45},kaynak:"TİTCK fiyat listesi; doz 200/28 KÜB'ine göre",dozKaynak:"Augmentin BID KÜB (Türkiye): amoksisilin 25–45 mg/kg/gün, otit/sinüzit/alt solunum yolunda 70 mg/kg/gün'e kadar, 2 doza bölünmüş; 2 yaş altında 45 mg/kg/gün üstü için veri yok; 2 aydan küçükte doz önerilmez (200/28 KÜB'i; 400/57 KÜB'i henüz yayımlanmamış)",url:"https://ilacabak.com/augmentin-400-mg-57-mg-5-ml-oral-suspansiyon-hazirlamak-icin-kuru-toz-100-ml-32107"}],
+    kaynak:"Yaygın referans aralığı (40–90 mg/kg/gün)"},
+  azitromisin:{grup:"Antibiyotikler",trKub:true,ad:"Azitromisin",doz:[10,10],gunMaxKg:10,gunMaxMg:500,dozMaxMg:500,minAy:6,minKg:5,
+    sik:[{n:1,saat:24}],sure:"Genelde 3 gün (hekim belirler)",sikNot:"Günde tek doz. Alternatif rejimlerde (1. gün 10 mg/kg, sonra 5 mg/kg × 5 gün; farenjit/tonsillitte 12 mg/kg × 5 gün) dozu hekim ayarlar.",
+    konc:[{mg:200,urun:"Zitromax Süspansiyon (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/T%C4%B0TCK%20Z%C4%B0TROMAX%20S%C3%9CSP%20UYGUN%20K%C3%9CB.pdf_ed212d6a-2ca2-4d96-bbfd-6922596d0e3c.pdf"}],
+    kaynak:"10 mg/kg/gün, günde 1 kez, 3 gün (Zitromax TİTCK KÜB); günlük en fazla 500 mg; 6 ay alt sınırı yurt dışı SmPC'den"},
+  klaritromisin:{grup:"Antibiyotikler",ustAy:{ay:144,metin:"Süspansiyon 6 ay–12 yaş için tarif edilmiştir (KÜB); 12 yaş üstünde erişkin formu/dozu gerekebilir."},trKub:true,ad:"Klaritromisin",doz:[7.5,7.5],gunMaxKg:15,gunMaxMg:1000,dozMaxMg:500,minAy:6,minKg:5,
+    sik:[{n:2,saat:12}],sikNot:"Günde 2 doz; 6 ay–12 yaş çocuklar için süspansiyon. Öğün başı en fazla 500 mg. Yemekten bağımsız verilebilir.",
+    konc:[{mg:125,urun:"Klaromin Süspansiyon (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/czxnhWOt8wMgl.pdf"},
+          {mg:125,urun:"Laricid Süspansiyon (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/KCT6VnnYRKMx0.pdf"},
+          {mg:250,urun:"Klacid Süspansiyon (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/e8yd3z37jLnhd.pdf"}],
+    kaynak:"7,5 mg/kg, günde 2 kez (Klacid, Klaromin, Laricid TİTCK KÜB); en fazla 500 mg/doz yurt dışı SmPC'den"},
+  sefiksim:{aile:"sef",bobrek:"uyari",grup:"Antibiyotikler",trKub:true,ad:"Sefiksim",gun:[8,8],gunMaxKg:8,gunMaxMg:400,dozMaxMg:400,minAy:6,minKg:5,
+    sik:[{n:1,saat:24},{n:2,saat:12}],sikNot:"Günde tek doz 8 mg/kg veya 12 saatte bir 4 mg/kg. 10 yaş üstü veya 50 kg üzeri çocuklarda erişkin dozu (günlük 200–400 mg) kullanılır. Sefalosporin alerjisinde kullanılmaz.",
+    konc:[{mg:100,urun:"Suprax Süspansiyon (Türkiye)",kaynak:"TİTCK KÜB",url:"https://www.eczacibasiilac.com.tr/EIP/media/EIP_Media/PDF/Suprax_Suspansiyon_KUB.pdf"},
+          {mg:100,urun:"Zimaks Süspansiyon (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/BTgWSDHClDlCC.pdf"},
+          {mg:100,urun:"Fixef Süspansiyon (Türkiye)",kaynak:"TİTCK KT",url:"https://titck.gov.tr/storage/Archive/2021/kubKtAttachments/FXEF100mg5mLpediatrikoralsspansiyonhazrlamakiinkurutozKT_c79875f7-c6a6-4ae2-b3fe-4f3f3d49dfac.pdf"}],
+    kaynak:"8 mg/kg/gün, 1 veya 2 doz, 6 ay ve üzeri (TİTCK KÜB: Suprax, Zimaks)"},
+  sefuroksim:{aile:"sef",bobrek:"uyari",grup:"Antibiyotikler",ad:"Sefuroksim aksetil",doz:[10,15],gunMaxKg:30,gunMaxMg:500,dozMaxMg:250,dozMaxLo:125,minAy:3,minKg:4,
+    sik:[{n:2,saat:12}],sikNot:"10 mg/kg/doz (en fazla 125 mg): tonsillit, farenjit, sinüzit. 15 mg/kg/doz (en fazla 250 mg): otit ve ağır enfeksiyonlar. Yemekle birlikte verilir. Sefalosporin alerjisinde kullanılmaz.",
+    konc:[{mg:125,urun:"Zinnat Süspansiyon (Türkiye)",kaynak:"Zinnat TİTCK KT; konsantrasyon emc SmPC",url:"https://titck.gov.tr/storage/Archive/2022/kubKtAttachments/kt_a1b7aa13-4d1e-4bba-8d28-965e8e0a14a9.pdf"},
+          {mg:250,urun:"Zinnat Süspansiyon (Türkiye)",kaynak:"Zinnat TİTCK KT; konsantrasyon emc SmPC",url:"https://titck.gov.tr/storage/Archive/2022/kubKtAttachments/kt_a1b7aa13-4d1e-4bba-8d28-965e8e0a14a9.pdf"}],
+    kaynak:"Günde 2 kez 10 mg/kg (en fazla 125 mg) – 15 mg/kg (en fazla 250 mg) (Zinnat TİTCK KT); 3 ay alt sınırı emc SmPC'den"},
+  setirizin:{grup:"Alerji ve Solunum",trKub:true,ad:"Setirizin",tip:"yas",bant:[[24,72,2.5,2.5,2],[72,144,5,5,2],[144,1200,10,10,1]],gunMaxKg:100,gunMaxMg:10,dozMaxMg:10,minAy:24,minKg:3,
+    sikNot:"2–12 yaş günde 2 kez, 12 yaş üstü günde 1 kez. 2 yaş altında önerilmez.",
+    konc:[{mg:5,urun:"Zyrtec Şurup (1 mg/mL, Türkiye)",kaynak:"TİTCK ürün KT",url:"https://medikalakademi.com.tr/wp-content/uploads/2019/12/zyrtec-setirizin-surup-1mg-recete.pdf"},
+          {mg:5,urun:"Yenizin Şurup (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/Archive/2021/kubKtAttachments/kb_191d1169-591b-4b33-b09e-276a7cd2529e.pdf"}],
+    kaynak:"Yaşa göre: 2–6 yaş 2,5 mg ×2; 6–12 yaş 5 mg ×2; 12 yaş üstü 10 mg ×1 (TİTCK KÜB)"},
+  desloratadin:{grup:"Alerji ve Solunum",trKub:true,ad:"Desloratadin",tip:"yas",bant:[[12,72,1.25,1.25,1],[72,144,2.5,2.5,1],[144,1200,5,5,1]],gunMaxKg:100,gunMaxMg:5,dozMaxMg:5,minAy:12,minKg:3,
+    sikNot:"Günde tek doz. 1 yaş altında etkinlik ve güvenlilik belirlenmemiştir.",
+    konc:[{mg:2.5,urun:"Aerius Oral Çözelti 0,5 mg/mL (Türkiye)",kaynak:"TİTCK KT/KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/63e6abf521098.pdf"}],
+    kaynak:"Yaşa göre: 1–5 yaş 1,25 mg; 6–11 yaş 2,5 mg; 12 yaş üstü 5 mg, günde 1 kez (Aerius KÜB)"},
+  ondansetron:{grup:"Bulantı",ad:"Ondansetron",tip:"kilo",bant:[[8,15,2,2,1],[15,30,4,4,1],[30,200,8,8,1]],gunMaxKg:100,gunMaxMg:8,dozMaxMg:8,minAy:6,minKg:8,
+    sikNot:"Gastroenterit kusmasında tek doz (etiket dışı kullanım). Türkiye prospektüsü yetişkin ağırlıklıdır, çocuk dozu için yurt dışı çalışma kullanıldı.",
+    konc:[{mg:4,urun:"Zofran Şurup 50 mL (GSK, Türkiye)",kaynak:"TİTCK ilaç listesi",url:"https://www.ilacrehberi.com/v/zofran-surup-50-ml-9fc8/ilac-prospektusu/formulu/"}],
+    kaynak:"Kilo aralığına göre tek doz: 8–15 kg 2 mg, 15–30 kg 4 mg, 30 kg üstü 8 mg (Freedman, NEJM 2006)"},
+  penisilinv:{grup:"Antibiyotikler",trKub:true,aile:"pen",bobrek:"uyari",u:"IU",ad:"Penisilin V (Fenoksimetilpenisilin)",gun:[50000,100000],gunMaxKg:100000,gunMaxMg:4500000,dozMaxMg:2250000,minAy:3,minKg:4,
+    sikKg:{kg:30,altN:3,ustN:2},sik:[{n:3,saat:8},{n:2,saat:12}],sure:"Semptomlar geçtikten en az 2–3 gün sonrasına kadar (KÜB)",
+    ustAy:{ay:144,metin:"Süspansiyon 12 yaş altı için tarif edilmiştir; ergen ve erişkinde Pen-Os 750 süspansiyon veya 1000 film tablet önerilir (KÜB)."},
+    sikNot:"KÜB ölçek tablosu: 30 kg altında günde 3 doz, 30 kg üzerinde günde 2 doz. Aç veya tok alınabilir. Günlük doz kg başına 25.000 IU'dan az olmamalıdır. Penisilin alerjisinde kullanılmaz.",
+    konc:[{mg:400000,olcekMl:5,urun:"Pen-Os 400 süspansiyon (400.000 IU/5 mL, Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/72b8d2df14646.pdf"},
+          {mg:750000,olcekMl:5,urun:"Pen-Os 750 süspansiyon (750.000 IU/5 mL; ürün adından, doğrulanmadı)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/88fee4ed37916.pdf"}],
+    kaynak:"12 yaş altı: günlük 50.000–100.000 IU/kg (30–60 mg/kg); günlük en fazla 3,0–4,5 milyon IU (Pen-Os KÜB)"},
+  nistatin:{grup:"Antifungal",trKub:true,u:"IU",ad:"Nistatin",gunMaxKg:1000000,gunMaxMg:5000000,dozMaxMg:600000,minAy:0,minKg:2,
+    sik:[{n:4,saat:6}],
+    endik:[{ad:"Bebek ve çocuk pamukçuğu (günde 4 kez 1 mL; Mikostatin KÜB)",sabitDoz:[100000,100000],n:4},
+           {ad:"Yenidoğan profilaksisi (günde 1 kez 1 mL)",sabitDoz:[100000,100000],n:1},
+           {ad:"Yüksek doz: günde 4 kez 1–2 mL (Fungostatin ve Mikoral KÜB)",sabitDoz:[100000,200000],n:4},
+           {ad:"Büyük çocuk: günde 4 kez 4–6 mL (Fungostatin prospektüsü)",sabitDoz:[400000,600000],n:4,lit:false}],
+    sure:"Belirtiler geçtikten sonra en az 48 saat daha (Fungostatin prospektüsü)",
+    sikNot:"Pipetle ağız içine damlatılır, mümkün olduğunca ağızda tutulur. Sistemik mikozlarda kullanılmaz. Günde 5 milyon IU üzerinde bulantı ve sindirim şikâyeti görülür (KÜB).",
+    konc:[{mg:500000,urun:"Mikostatin 100.000 IU/mL oral süspansiyon (Deva, Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/Archive/2021/kubKtAttachments/MKOSTATN100.000KB_d9eae0d1-5f8b-4f22-b075-5fc4f4545864.pdf"},
+          {mg:500000,urun:"Fungostatin 100.000 IU/mL oral süspansiyon için toz (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/BwjA3i09E6kF5.pdf"}],
+    kaynak:"Bebek ve çocuk pamukçuğu günde 4 kez 1 mL (Mikostatin KÜB); önerilen günde 4 kez 1–2 mL (Fungostatin KÜB)"},
+  flukonazol:{grup:"Antifungal",trKub:true,ad:"Flukonazol",minAy:1,minKg:3,gunMaxKg:12,gunMaxMg:400,dozMaxMg:400,
+    endik:[{ad:"Mukozal kandidiyazis, idame (3 mg/kg/gün)",gun:[3,3]},{ad:"Mukozal kandidiyazis, 1. gün yükleme (6 mg/kg)",gun:[6,6]},{ad:"İnvazif kandidiyazis ve kriptokok (6–12 mg/kg/gün)",gun:[6,12]}],
+    sik:[{n:1,saat:24}],
+    sikNot:"Günde tek doz; günlük en fazla 400 mg (KÜB). 1 aydan küçüklerde doz aralığı 48–72 saattir, bu araç 1 ay altında doz önermez. Böbrek yetmezliğinde doz azaltılır.",
+    konc:[{mg:25,urun:"Triflucan 5 mg/mL şurup (Pfizer, Türkiye)",kaynak:"TİTCK KÜB",url:"https://labeling.pfizer.com/ShowLabeling.aspx?id=19233"}],
+    kaynak:"Mukozal kandidiyazis 3 mg/kg/gün (ilk gün 6 mg/kg yükleme); invazif 6–12 mg/kg/gün; günlük en fazla 400 mg (Triflucan ve Fluzole KÜB)"},
+  montelukast:{grup:"Alerji ve Solunum",trKub:true,ad:"Montelukast",tip:"yas",bant:[[12,72,4,4,1],[72,180,5,5,1],[180,217,10,10,1]],gunMaxKg:100,gunMaxMg:10,dozMaxMg:10,minAy:12,minKg:5,
+    sikNot:"Günde bir kez akşam (KÜB). Akut astım atağında kullanılmaz; inhale veya oral steroidin yerine aniden konmaz. Ajitasyon, saldırganlık gibi nöropsikiyatrik olaylar bildirilmiştir; belirti çıkarsa hekime bildirin.",
+    konc:[{mg:4,adet:"saşe",yasAy:[12,72],urun:"Singulair 4 mg pediyatrik oral granül (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/5eb0e3ab50640.pdf"},
+          {mg:4,adet:"çiğneme tableti",yasAy:[24,72],urun:"Singulair 4 mg çiğneme tableti (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/Archive/2021/kubKtAttachments/SINGULAIR4mginemetabletikub_c4c35d58-9802-4b7f-ae64-c2d82e7aaf2f.pdf"},
+          {mg:5,adet:"çiğneme tableti",yasAy:[72,180],urun:"Singulair 5 mg çiğneme tableti (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/Archive/2021/kubKtAttachments/SINGULAIR5mginemetabletikub_2b2d27f3-4520-474d-96b2-a727c6e0c695.pdf"},
+          {mg:10,adet:"film tablet",yasAy:[180,217],urun:"Singulair 10 mg film tablet (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/Archive/2020/kubKtAttachments/uygunkub_2730f587-d586-462f-8bf6-5250e4fca442.pdf"}],
+    kaynak:"Günde 1 kez akşam: 12 ay–5 yaş 4 mg granül, 2–5 yaş 4 mg çiğneme, 6–14 yaş 5 mg çiğneme, 15 yaş ve üzeri 10 mg film tablet (Singulair KÜB)"},
+  salbutamol:{grup:"Alerji ve Solunum",trKub:true,ad:"Salbutamol",tip:"yas",bant:[[24,72,1,2,0],[72,144,2,2,0],[144,217,2,4,0]],gunMaxKg:100,gunMaxMg:16,dozMaxMg:4,minAy:24,minKg:8,
+    sik:[{n:3,saat:8},{n:4,saat:6}],
+    sikNot:"Günde 3 veya 4 kez (KÜB). Etkisi azalırsa doktora danışılır. Kalp hızı artışı ve titreme görülebilir.",
+    konc:[{mg:2,urun:"Ventolin 2 mg/5 mL şurup (GSK, Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/Archive/2022/kubKtAttachments/kb_4873707a-e44b-4876-9d9a-849793dce09a.pdf"},
+          {mg:2,urun:"Ventubol 2 mg/5 mL şurup (Türkiye)",kaynak:"TİTCK KT",url:"https://titck.gov.tr/storage/Archive/2022/kubKtAttachments/yaynlanacakktventurolurup_80062137-9084-46c6-ab70-408eae93aa90.pdf"}],
+    kaynak:"2–6 yaş 1–2 mg, 6–12 yaş 2 mg, 12 yaş üstü 2–4 mg; günde 3–4 kez (Ventolin KÜB)"},
+  prednizolon:{grup:"Alerji ve Solunum",ad:"Prednizolon",gun:[1,2],gunMaxKg:2,gunMaxMg:40,dozMaxMg:40,minAy:12,minKg:5,
+    sik:[{n:1,saat:24},{n:2,saat:12}],sure:"Astım atağında 3–5 gün (GINA)",
+    sikNot:"Astım atağında 1–2 mg/kg/gün, 3–5 gün, en fazla 40 mg/gün (GINA ve çocuk çalışmaları). Türkiye KÜB'ünde çocuk mg/kg dozu yoktur; Türkiye'de yalnızca 5 mg tablet bulundu (şurup veya süspansiyon bulunamadı). Küçük çocuklarda tablet bölme gerekir. 3 haftadan uzun kullanımda ani kesilmez.",
+    konc:[{mg:5,adet:"tablet",urun:"Deltacortril 5 mg tablet (Pfizer, Türkiye)",kaynak:"TİTCK KÜB",url:"https://labeling.pfizer.com/ShowLabeling.aspx?id=19327"}],
+    kaynak:"Pediatrik astım atağı: 1–2 mg/kg/gün, 3–5 gün (GINA); çalışmalarda en fazla 40 mg/gün"},
+  dvit:{grup:"Vitamin ve Mineral",trKub:true,u:"IU",ad:"D Vitamini (Kolekalsiferol)",gunMaxKg:100000,gunMaxMg:5000,dozMaxMg:5000,minAy:0,minKg:2,
+    sik:[{n:1,saat:24}],
+    endik:[{ad:"Profilaksi ve idame, yenidoğan–1 yaş (400 IU/gün)",sabitDoz:[400,400],n:1,yasAy:[0,12]},
+           {ad:"Profilaksi ve idame, 1–18 yaş (400–800 IU/gün)",sabitDoz:[400,800],n:1,yasAy:[12,217]},
+           {ad:"Eksiklik tedavisi, yenidoğan (1.000 IU/gün)",sabitDoz:[1000,1000],n:1,yasAy:[0,1]},
+           {ad:"Eksiklik tedavisi, 1 ay–1 yaş (2.000–3.000 IU/gün)",sabitDoz:[2000,3000],n:1,yasAy:[1,12]},
+           {ad:"Eksiklik tedavisi, 1–10 yaş (3.000–5.000 IU/gün)",sabitDoz:[3000,5000],n:1,yasAy:[12,132]},
+           {ad:"Eksiklik tedavisi, 11–18 yaş (3.000–5.000 IU/gün)",sabitDoz:[3000,5000],n:1,yasAy:[132,217]}],
+    sikNot:"Devit-3 KÜB tablosu: profilakside tolere edilen en yüksek günlük doz yenidoğan 1.000, 1 ay–1 yaş 1.500, 1–10 yaş 2.000, 11–18 yaş 4.000 IU; 800 IU yetmezse gerektiğinde 1.000 IU'ya çıkılabilir. Günlük yerine haftalık doz tercih edilirse tek seferde 50.000 IU (6–8 haftaya kadar); tek seferde 50.000 IU'dan fazla verilmez. Terapötik indeksi bebek ve çocukta düşüktür, hiperkalsemi riski vardır. Ürün bilgi özetinde önleyici doz günlük 4–8 damla olarak geçer.",
+    konc:[{mg:16666.67,urun:"Devit-3 50.000 IU/15 mL oral damla (Deva, Türkiye; 3.333 IU/mL)",kaynak:"TİTCK KÜB",url:"https://deva.com.tr/uploads/product_files/q5jx6Ww5h3Y4bjROBvKe.pdf"},
+          {mg:100000,damla:25,urun:"Devit-3 200.000 IU/10 mL oral damla (Deva, Türkiye; 20.000 IU/mL, 1 damla ≈ 800 IU)",kaynak:"Deva kullanma talimatı",url:"https://deva.com.tr/uploads/product_files/cY6i8qN8T29IaZvUGqcF.pdf"}],
+    kaynak:"Yaşa göre profilaksi ve eksiklik tedavisi tablosu (Devit-3 KÜB ve kullanma talimatı)"},
+  demir:{grup:"Vitamin ve Mineral",trKub:true,ad:"Demir (Elementer)",gunMaxKg:1000,gunMaxMg:200,dozMaxMg:100,minAy:0,minKg:2,
+    sik:[{n:1,saat:24},{n:2,saat:12},{n:3,saat:8}],
+    endik:[{ad:"Yenidoğan (1 damla/kg/gün)",gun:[2.5,2.5],n:1,yasAy:[0,1]},
+           {ad:"1 ay–1 yaş (günde 5 damladan 20 damlaya)",sabitGun:[12.5,50],n:2,yasAy:[1,12]},
+           {ad:"1–12 yaş (günde 1–2 kez 20 damla, 50–100 mg/gün)",sabitDoz:[50,50],yasAy:[12,144]},
+           {ad:"12 yaş üstü (günde 2 kez 20 damla, 100 mg/gün)",sabitDoz:[50,50],n:2,yasAy:[144,217]},
+           {ad:"Demir eksikliği anemisi, kg bazlı tedavi (3–6 mg/kg/gün; literatür)",gun:[3,6],yasAy:[1,217],lit:true,not:"Bu satır Türkiye KÜB'ünden değil, literatürden alınmıştır: elementer demir 3–6 mg/kg/gün, 2–3 doza bölünmüş, günlük en fazla 180–200 mg (BC Guidelines 2010; BNF for Children 2012). Pediatrist onayı gerekir."}],
+    sikNot:"Anemi her zaman doktor gözetiminde tedavi edilir; belirtiler geçtikten sonra depoların dolması için en az 1 ay sürdürülür (Ferifer KÜB). 20 mg/kg üzerindeki dozlarda hipotansiyon, şok, asidoz ve konvülsiyon görülebilir; kazara fazla alımda hemen 114'ü arayın.",
+    konc:[{mg:250,damla:20,urun:"Ferifer 50 mg/mL oral damla (Türkiye; 1 mL = 20 damla)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/Archive/2020/kubKtAttachments/TTCKFERFERORALDAMLASENDKAUYGUNKB_471e8ab1-0faa-42d3-8a3e-b4f85869d36e.pdf"},
+          {mg:50,urun:"Ferrum Hausmann 50 mg/5 mL şurup (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/T%C4%B0TCK%20UYGUN%20K%C3%9CB%20FERRUM%20HAUSMANN%2050%20MG-5%20ML%20%C5%9EURUP.pdf_57303016-44e2-4bb1-90f0-e551df12661c.pdf"}],
+    kaynak:"Yenidoğan 1 damla/kg; 1 yaşa kadar 5–20 damla/gün; 1–12 yaş günde 1–2 kez 20 damla (50–100 mg); 12 yaş üstü 2 × 20 damla (Ferifer KÜB); Ferrum Hausmann çocuklarda günde 50–100 mg"},
+  metronidazol:{grup:"Antibiyotikler",endik:[{ad:"Amibiyaz",gun:[30,40]},{ad:"Anaerop enfeksiyon",gun:[20,30]},{ad:"Anaerop enfeksiyon (ağır, 40 mg/kg/güne kadar)",gun:[20,40]},{ad:"Giardiyaz (yaşa göre sabit doz)",sabit:[[24,60,250],[60,120,375],[120,180,500]]}],trKub:true,ad:"Metronidazol",gun:[20,40],gunMaxKg:40,gunMaxMg:2400,dozMaxMg:2400,minAy:2,minKg:3,
+    sik:[{n:3,saat:8},{n:1,saat:24}],sikNot:"Anaerop enfeksiyonda 20–30 mg/kg/gün (tek doz veya 8 saatte bir 7,5 mg/kg); amibiyaz/giardiyazda 30–40 mg/kg/gün, 3 doza bölünür. Günlük en fazla 2400 mg.",
+    konc:[{mg:125,urun:"Flagyl Süspansiyon (Türkiye)",kaynak:"TİTCK KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/ce28385d81019.pdf"}],
+    kaynak:"20–40 mg/kg/gün, 8 hafta ve üzeri (Flagyl TİTCK KÜB)"}
+};
+const $ = id => document.getElementById(id);
+const num = v => parseFloat(String(v).replace(",", "."));
+const f = (n, d = 0) => n.toLocaleString("tr-TR", {maximumFractionDigits: d});
+const rng = (a, b, d = 0) => (Math.abs(a - b) < 1e-9 ? f(a, d) : f(a, d) + "–" + f(b, d));
+let sikIdx = 0;
+
+function fmtYas(a) { if (a < 24) return a + " ay"; const y = Math.floor(a / 12), m = a % 12; return y + " yaş" + (m ? " " + m + " ay" : "") + " (" + a + " ay)"; }
+function makeSlider(el) {
+  const id = el.dataset.id, kind = el.dataset.kind, min = +el.dataset.min, max = +el.dataset.max, fine = +el.dataset.fine, start = +el.dataset.start;
+  el.innerHTML = `<div class="slh"><span class="slv off" id="${id}V">Seçilmedi</span><span class="slb"><button type="button" data-a="-1" aria-label="Azalt">−</button><button type="button" data-a="1" aria-label="Artır">+</button><button type="button" data-a="0" aria-label="Temizle" title="Temizle">✕</button></span></div>` +
+    `<input type="range" id="${id}S" min="${min}" max="${max}" step="${el.dataset.step}" value="${start}" aria-label="${kind === "kilo" ? "Kilo" : "Yaş (ay)"}"><div class="slr"><span>${el.dataset.lo}</span><span>${el.dataset.hi}</span></div><input type="hidden" id="${id}">`;
+  const r = $(id + "S"), h = $(id), v = $(id + "V");
+  function set(x) {
+    if (x === null) { h.value = ""; r.value = start; v.textContent = "Seçilmedi"; v.classList.add("off"); }
+    else { x = Math.min(max, Math.max(min, Math.round(x * 10) / 10)); h.value = String(x); r.value = x; v.classList.remove("off"); v.textContent = kind === "kilo" ? x.toLocaleString("tr-TR", {minimumFractionDigits: 1, maximumFractionDigits: 1}) + " kg" : fmtYas(x); }
+    h.dispatchEvent(new Event("input", {bubbles: true}));
+  }
+  r.addEventListener("input", () => set(+r.value));
+  el.querySelector(".slb").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    const a = +b.dataset.a; if (a === 0) return set(null);
+    set((h.value === "" ? start : +h.value) + a * fine);
+  });
+}
+function uyum(w, a) {
+  const y = a / 12, med = a < 12 ? 0.5 * a + 4 : y <= 5 ? (y + 4) * 2 : y < 12 ? 3 * y + 7 : 45, lo = med * 0.5, hi = med * 2;
+  return (w < lo || w > hi) ? `Kilo (${f(w, 1)} kg) bu yaş (${fmtYas(a)}) için beklenen aralığın (yaklaşık ${f(lo, 0)}–${f(hi, 0)} kg) dışında. Kilo ve yaşı kontrol edin.` : null;
+}
+document.querySelectorAll(".sl").forEach(makeSlider);
+
+
+{ const g = {}; Object.entries(ILACLAR).forEach(([k, v]) => (g[v.grup] = g[v.grup] || []).push([k, v]));
+  $("ilac").innerHTML = Object.entries(g).map(([n, l]) => `<optgroup label="${bas(n)}">${l.map(([k, v]) => `<option value="${k}">${bas(v.ad)}</option>`).join("")}</optgroup>`).join(""); }
+
+function fillDrug() {
+  const d = ILACLAR[$("ilac").value];
+  $("konc").innerHTML = d.konc.map((c, i) => `<option value="${i}">${f(c.mg)} ${d.u || "mg"} / ${c.adet || "5 mL"} · ${c.urun}</option>`).join("");
+  sikIdx = 0; fillSik(); fillEndik();
+}
+function fillEndik() {
+  const d = ILACLAR[$("ilac").value];
+  $("endikW").hidden = !d.endik;
+  $("endik").innerHTML = d.endik ? d.endik.map((e, i) => `<option value="${i}">${e.ad}</option>`).join("") : "";
+}
+function fillSik() {
+  const d = ILACLAR[$("ilac").value], e = d.endik ? d.endik[+$("endik").value || 0] : null;
+  if ((d.bant && !d.sik) || (e && e.n)) { $("sik").innerHTML = '<div class="hint">Sıklık yaş, kilo veya endikasyona göre belirlenir.</div>'; return; }
+  $("sik").innerHTML = d.sik.map((s, i) => `<button type="button" data-i="${i}" aria-pressed="${i === sikIdx}">Günde ${s.n} kez</button>`).join("");
+}
+
+function hesapla() {
+  { const dd0 = ILACLAR[$("ilac").value], y0 = $("yas").value.trim() === "" ? null : num($("yas").value);
+    if (dd0.endik && y0 !== null && dd0.endik.some(x => x.yasAy)) {
+      const cur = dd0.endik[+$("endik").value || 0];
+      if (cur.yasAy && (y0 < cur.yasAy[0] || y0 >= cur.yasAy[1])) { const i = dd0.endik.findIndex(x => x.yasAy && y0 >= x.yasAy[0] && y0 < x.yasAy[1]); if (i >= 0) { $("endik").value = i; fillSik(); } }
+    } }
+  const d = ILACLAR[$("ilac").value], out = $("sonuc"), k = d.konc[+$("konc").value] || d.konc[0], e = d.endik ? d.endik[+$("endik").value || 0] : null;
+  const w = num($("kilo").value), yas = $("yas").value.trim() === "" ? null : num($("yas").value);
+  if (!$("kilo").value.trim()) { out.innerHTML = '<div class="empty">Kiloyu seçince sonuç burada görünür.</div>'; return; }
+  const bad = m => { out.innerHTML = `<div class="msg bad" style="margin:0">${m}</div>`; };
+  if (isNaN(w) || w <= 0) return bad("Geçerli bir kilo girin.");
+  if (w < 2 || w > 80) return bad("Kilo 2–80 kg dışında. Bu araç bu aralık için doz önermez.");
+  if (w < d.minKg) return bad(`${d.ad} için en az ${d.minKg} kg gerekir. Bu araç doz önermez.`);
+  if (yas !== null && (isNaN(yas) || yas < 0)) return bad("Yaş çubuğunu ayarlayın ya da temizleyin.");
+  const minAy = Math.max(d.minAy, k.minAy || 0);
+  if (yas !== null && yas < minAy) return bad(`${d.ad} (${k.urun}) için en az ${minAy} aylık olmak gerekir. Bu araç doz önermez.`);
+  if (k.yasAy && yas !== null && (yas < k.yasAy[0] || yas >= k.yasAy[1])) return bad(`${k.urun} ${k.yasAy[0]}–${k.yasAy[1]} ay arası içindir; yaşa uygun ürünü seçin.`);
+
+  if (e && e.sabit) {
+    if (yas === null) return bad("Bu endikasyonda doz yaşa göre sabittir; yaş çubuğunu ayarlayın.");
+    const b = e.sabit.find(b => yas >= b[0] && yas < b[1]);
+    if (!b) return bad("Bu yaş için KÜB'de bu endikasyon dozu tanımlı değil.");
+    out.innerHTML = `<div class="lbl">${bas(d.ad)}, ${e.ad}</div><div class="big">${f(b[2])} <small>mg / gün</small></div><div class="big">${f(b[2] * 5 / k.mg, 1)} <small>mL / gün</small></div><dl><dt>Süre</dt><dd>5 gün</dd></dl>${uyKart(["Günlük dozun kaça bölüneceğini ürün KÜB'ünden kontrol edin; yaşa göre sabit dozdur (kilo hesabı yapılmaz)."])}${kaynakKutu(!!d.trKub, `Ürün: <a href="${k.url}" target="_blank" rel="noopener">${k.urun}</a><br>Doz: ${d.kaynak}`)}`;
+    return;
+  }
+  const notes = [];
+  let s = d.sik && d.sik[sikIdx], rawLo, rawHi;
+  if (e && e.n) s = {n: e.n, saat: 24 / e.n};
+  if (e && e.yasAy && yas !== null && (yas < e.yasAy[0] || yas >= e.yasAy[1])) return bad(`${bas(d.ad)} için seçilen endikasyon ${e.yasAy[0]}–${e.yasAy[1]} ay arası içindir; yaşa uygun endikasyonu seçin.`);
+  if (e && (e.sabitDoz || e.sabitGun)) {
+    if (e.sabitDoz) { rawLo = e.sabitDoz[0]; rawHi = e.sabitDoz[1]; } else { rawLo = e.sabitGun[0] / s.n; rawHi = e.sabitGun[1] / s.n; }
+  } else if (d.bant) {
+    const v = d.tip === "yas" ? yas : w;
+    if (v === null) return bad("Bu ilaç yaşa göre dozlanır; yaş çubuğunu ayarlayın.");
+    const b = d.bant.find(b => v >= b[0] && v < b[1]);
+    if (!b) return bad("Bu değer için doz aralığı tanımlı değil; bu araç doz önermez.");
+    s = b[4] ? {n: b[4], saat: 24 / b[4]} : s; rawLo = b[2]; rawHi = b[3];
+  } else { const pd = d.doz || ((e && e.gun) || k.gun || d.gun).map(x => x / s.n); rawLo = pd[0] * w; rawHi = pd[1] * w; }
+  let lo = Math.min(rawLo, d.dozMaxLo || d.dozMaxMg), hi = Math.min(rawHi, d.dozMaxMg);
+  if (rawHi > d.dozMaxMg) notes.push("Hesaplanan doz öğün başı üst sınırı aştığı için üst sınıra indirildi.");
+  let gunCap = Math.min((e && e.gun ? e.gun[1] : (k.gunMaxKg || d.gunMaxKg)) * w, d.gunMaxMg);
+  if (k.yasGunMax && yas !== null && yas < k.yasGunMax.ay) gunCap = Math.min(gunCap, k.yasGunMax.mgKg * w);
+  let gLo = lo * s.n, gHi = hi * s.n;
+  if (gHi > gunCap) { gHi = gunCap; hi = gunCap / s.n; lo = Math.min(lo, hi); gLo = Math.min(gLo, gHi); notes.push(`Hesaplanan doz günlük üst sınırı aştığı için üst sınıra indirildi.`); }
+  if (yas === null) notes.push("Yaş girilmedi; yaş sınırı kontrol edilmedi.");
+  else { const uy = uyum(w, yas); if (uy) notes.push(uy); }
+  if (d.ustAy && yas !== null && yas >= d.ustAy.ay) notes.push(d.ustAy.metin);
+  if (k.n && k.n !== s.n) notes.push(`${k.urun} günde ${k.n} doz için hazırlanmıştır; sıklığı kontrol edin.`);
+  if ($("ilac").value === "parasetamol") paraNotlari(notes);
+  if (d.sikKg) { const hedef = w > d.sikKg.kg ? d.sikKg.ustN : d.sikKg.altN; if (s.n !== hedef) notes.push(`KÜB ölçek tablosu: ${d.sikKg.kg} kg ${w > d.sikKg.kg ? "üzerinde" : "ve altında"} günde ${hedef} doz önerilir; sıklığı değiştirin.`); }
+
+  if (e && e.not) notes.push(e.not);
+  const ml = mg => mg * 5 / k.mg, u = d.u || "mg", dd = hi < 10 ? 2 : hi < 100 ? 1 : 0, adet = k.adet, birim = adet || "mL", cnt = x => adet ? x / k.mg : ml(x);
+  const sabit = !!(e && (e.sabitDoz || e.sabitGun)), gunR = (!d.bant && !d.doz && !sabit) ? ((e && e.gun) || k.gun || d.gun) : null;
+  const damla = k.damla ? `≈ ${rng(ml(lo) * k.damla, ml(hi) * k.damla, 0)} damla (1 mL = ${k.damla} damla)` : "";
+  const miktar = adet ? `${rng(cnt(lo), cnt(hi), 2)} ${adet}` : `${rng(ml(lo), ml(hi), 1)} mL${k.damla ? ` (yaklaşık ${rng(ml(lo) * k.damla, ml(hi) * k.damla, 0)} damla)` : ml(hi) >= 1 ? ` (yaklaşık ${rng(ml(lo) / 5, ml(hi) / 5, 1)} çay kaşığı)` : ""}`;
+  const ebeveyn = [`${bas(d.ad)} (${k.urun}).`, `Günde ${s.n} kez (her ${s.saat} saatte bir).`, `Her seferinde ${miktar}.${adet ? "" : " Ürünle gelen ölçek veya enjektörle ölçün."}`, d.sure ? `Süre: ${d.sure}.` : "", d.grup === "Antibiyotikler" ? "Antibiyotiği hekimin belirlediği süre boyunca verin." : "", "Hekiminizin söylediği miktarı kullanın."].filter(Boolean).join(" ");
+  out.innerHTML = `
+    <div class="lbl">${bas(d.ad)}, ${f(w, 1)} kg</div>
+    <div class="rx">Günde ${s.n} kez · her ${s.saat} saatte bir</div>
+    <div class="big">${rng(lo, hi, hi < 10 ? 2 : hi < 100 ? 1 : 0)} <small>${u} / doz</small></div>
+    <div class="big">${rng(cnt(lo), cnt(hi), adet ? 2 : 1)} <small>${birim} / doz</small></div>
+    ${adet ? "" : (k.damla ? `<div class="zm">${damla}</div>` : "") + (ml(hi) >= 1 ? `<div class="zm">≈ ${rng(ml(lo) / 5, ml(hi) / 5, 1)} çay kaşığı (1 çay kaşığı = 5 mL). Ürünle gelen ölçek veya enjektörü kullanın.${k.olcekMl ? ` ≈ ${rng(ml(lo) / k.olcekMl, ml(hi) / k.olcekMl, 1)} ürün ölçeği (1 ölçek ≈ ${k.olcekMl} mL, KÜB tablosundan çıkarım).` : ""}</div>` : "")}
+    <dl>
+      <dt>Günlük Toplam</dt><dd>${rng(gLo, gHi, gHi < 10 ? 2 : gHi < 100 ? 1 : 0)} ${u}</dd>
+      ${d.sure ? `<dt>Süre</dt><dd>${d.sure}</dd>` : ""}
+    </dl>
+    ${uyKart([d.sikNot, ...notes])}
+    ${hesapKutu([sabit ? `Sabit doz (KÜB): ${rng(rawLo, rawHi, dd)} ${u} / doz` : d.bant ? `Yaş/kilo aralığı tablosu: ${rng(rawLo, rawHi, dd)} ${u} / doz` : gunR ? `${f(w, 1)} kg × ${rng(gunR[0], gunR[1], 2)} ${u}/kg/gün ÷ ${s.n} doz = ${rng(rawLo, rawHi, dd)} ${u} / doz` : `${f(w, 1)} kg × ${rng(rawLo / w, rawHi / w, 2)} ${u}/kg/doz = ${rng(rawLo, rawHi, dd)} ${u}`, (Math.abs(lo - rawLo) > 1e-9 || Math.abs(hi - rawHi) > 1e-9) ? `Üst sınırlar uygulanınca: ${rng(lo, hi, dd)} ${u} / doz` : "", `× ${s.n} doz = ${rng(gLo, gHi, dd)} ${u} / gün`, adet ? `${rng(lo, hi, dd)} ${u} ÷ ${f(k.mg)} ${u}/${adet} = ${rng(cnt(lo), cnt(hi), 2)} ${adet}` : `${rng(lo, hi, dd)} ${u} × 5 ÷ ${f(k.mg)} ${u}/5 mL = ${rng(ml(lo), ml(hi), 1)} mL / doz`])}
+    ${kaynakKutu(!!d.trKub && !(e && e.lit), `Ürün: <a href="${k.url}" target="_blank" rel="noopener">${k.urun} (${f(k.mg)} ${u} / ${adet || "5 mL"}), ${k.kaynak}</a><br>Doz: ${k.dozKaynak || d.kaynak}`)}
+    <div class="eb"><b>Ebeveyn İçin Not:</b> ${ebeveyn}</div>`;
+}
+
+$("ilac").addEventListener("change", () => { fillDrug(); hesapla(); });
+$("sik").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; sikIdx = +b.dataset.i; fillSik(); hesapla(); });
+["kilo", "yas", "konc", "endik"].forEach(id => $(id).addEventListener("input", hesapla));
+$("endik").addEventListener("change", () => { fillSik(); hesapla(); });
+$("konc").addEventListener("change", () => { const d = ILACLAR[$("ilac").value], k = d.konc[+$("konc").value]; if (k && k.n) { const i = d.sik.findIndex(x => x.n === k.n); if (i >= 0) { sikIdx = i; fillSik(); } } hesapla(); });
+fillDrug(); hesapla();
+
+// ---- Acil IV bölümü (şuruplardan ayrı). Doğrulanmış ilaçlar buraya eklenir.
+// Şablon: {ad, endikasyon, dozMgKg:[min,max], dozMaxMg, ampul:[{mgMl, urun, url, kaynak}], seyreltme, hiz, kaynak}
+const A = (c, urun, seyreltme, url) => ({mgMl: c, urun, seyreltme, url});
+const U = {pals:"https://advancedmedicalcertification.com/lesson/pharmacological-therapy-pals-online-handbook", sz:"https://www.erc.edu/umbraco/api/download-page/download/e6600789-59bd-408a-bfd9-0145d1dcd0b9", cps:"https://cps.ca/uploads/documents/TABLE_2._Anticonvulsant_drug_therapies_for_convulsive_status_epilepticus_(CSE)_.pdf", rch:"https://www.legacyhealth.org/-/media/Files/PDF/Health-Professionals/ReferAPatient/Referral-forms/RCH_Peds-Emergency-Reference-Card_Jan-2013.pdf", ast:"https://nortonhealthcareprovider.com/wp-content/uploads/asthma-exacerbation-ed-management-1-17-yo.pdf", pf:"https://www.medicines.org.uk/emc/medicine/14288", sf:"https://sf.gov/file/emsa-protocol-812-pediatric-pain-control", ada:"https://adacounty.id.gov/paramedics/wp-content/uploads/sites/62/PM-07_-Pediatric-Pain-Control-01MAY2022.pdf", um:"https://www.umassmed.edu/globalassets/pediatrics/pediatrics-residency-program/woo-insider/logistics/pedi-dosing-card-2026-2027_final-pdf.pdf", peak:"https://media.emscimprovement.center/documents/PEAK_Status_Epilepticus_Algorithm.pdf"};
+const STD = "Standart ampul; ürün etiketini kontrol edin";
+const ILAC_IV = {
+  adrenalin_iv:{grup:"Resüsitasyon",ad:"Adrenalin IV/IO",endikasyon:"Arrest, şok",dozMgKg:[0.01,0.01],dozMaxMg:1,sik:"3–5 dakikada bir tekrarlanabilir",hiz:"Hızlı bolus, ardından SF ile yıkama",not:"Türkiye'de adrenalin ampulleri 0,25, 0,5 ve 1 mg/mL olarak bulunur. Seyrelttiğiniz ampulün gücünü etiketten kontrol edin.",url:U.pals,kaynak:"PALS: 0,01 mg/kg IV/IO (0,1 mg/mL), en fazla 1 mg",ampul:[A(0.1,"Adrenalin 1:10.000 (Türkiye'deki adrenalin ampulünden hazırlanır)","1 mg/mL ampulden: 1 mL + 9 mL SF","https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf")]},
+  atropin:{grup:"Resüsitasyon",ad:"Atropin",endikasyon:"Bradikardi",dozMgKg:[0.02,0.02],dozMinMg:0.1,dozMaxMg:0.5,sik:"Gerekirse bir kez tekrarlanabilir (3–5 dk)",hiz:"Hızlı IV/IO bolus",url:U.pals,kaynak:"PALS: 0,02 mg/kg, en az 0,1 mg, tek doz en fazla 0,5 mg",ampul:[A(0.25,"Atropin sülfat ampul ¼'lük 0,25 mg/mL (Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf"),A(0.5,"Atropin sülfat ampul ½'lik 0,5 mg/mL (Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf"),A(1,"Atropin sülfat ampul 1 mg/mL (Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf")]},
+  amiodaron:{grup:"Resüsitasyon",ad:"Amiodaron",endikasyon:"VF/nabızsız VT, taşikardi",dozMgKg:[5,5],dozMaxMg:300,sik:"Tekrarlanabilir (günlük en fazla 15 mg/kg)",hiz:"Arrestte hızlı bolus; nabızlı ritimde 20–60 dk",url:U.pals,kaynak:"PALS: 5 mg/kg IV/IO, en fazla 300 mg",ampul:[A(50,"Cordarone 150 mg/3 mL ampul (Sanofi, Türkiye)","Nabızlı ritimde %5 dekstrozla seyreltip yavaş verin","https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.LS.26%20TEMEL%20%C4%B0LA%C3%87%20VE%20SERUM%20L%C4%B0STES%C4%B0_1711091010177082.pdf")]},
+  adenozin:{grup:"Resüsitasyon",ad:"Adenozin",endikasyon:"SVT",dozMgKg:[0.1,0.1],dozMaxMg:6,sik:"2. doz 0,2 mg/kg (en fazla 12 mg)",hiz:"Çok hızlı IV bolus, hemen SF ile yıkama",url:U.pals,kaynak:"PALS: ilk doz 0,1 mg/kg, en fazla 6 mg",ampul:[A(3,"Adozin 6 mg/2 mL ampul (VEM, Türkiye)",undefined,"https://ilacabak.com/adozin-6-mg-2-ml-i-v-enjeksiyonluk-cozelti-iceren-ampul-1-ampul-16651"),A(3,"Adenotek 6 mg/2 mL ampul (Farma-Tek, Türkiye)",undefined,"https://ilacabak.com/adenotek-6-mg-2ml-iv-enj-inf-icin-coz-iceren-1-ampul-18417"),A(5,"Adenosin-L.M. 5 mg/mL ampul (Abfen, Türkiye)",undefined,"https://www.ilacrehberi.com/v/adenotek-6-mg2ml-iv-enjinf-icin-coz-iceren-1-ampu-f434/esdegerleri/")]},
+  bikarbonat:{grup:"Resüsitasyon",ad:"Sodyum bikarbonat",endikasyon:"Metabolik asidoz, hiperkalemi",u:"mEq",dozMgKg:[1,1],dozMaxMg:50,sik:"Hekim belirler",hiz:"Yavaş bolus; ventilasyon sağlandıktan sonra",not:"Hiperozmolardır. Kalsiyum ile karışmaz.",url:U.pals,kaynak:"PALS: 1 mEq/kg yavaş bolus, en fazla 50 mEq (Türkiye KÜB'leri yalnızca erişkin dozu verir: 1 mmol/kg)",ampul:[A(1,"Sodyum Bikarbonat %8,4 ampul, 10 mL (Drogsan, Türkiye)","KÜB kullanma talimatı: 1:1 oranda %5 dekstrozla seyreltilebilir","https://titck.gov.tr/storage/kubKtAttachments/6b9e381399024.pdf"),A(1,"Sodyum Bikarbonat %8,4 IV infüzyon için çözelti, 10 mL ampul (Türkiye)","KÜB kullanma talimatı: 1:1 oranda %5 dekstrozla seyreltilebilir","https://titck.gov.tr/storage/kubKtAttachments/9d739ea610165.pdf")]},
+  dekstroz:{grup:"Resüsitasyon",ad:"Dekstroz",endikasyon:"Hipoglisemi",u:"g",dozMgKg:[0.5,1],dozMaxMg:25,sik:"Kan şekerine göre",hiz:"IV/IO bolus",url:U.pals,kaynak:"PALS: 0,5–1 g/kg (%10: 5–10 mL/kg); Türkiye ürünleri %10, %20, %30, %50 (KÜB: hipoglisemi endikasyonu)",ampul:[A(0.1,"PF %10 Dekstroz (Türkiye)",undefined,"https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/TITCK-ONAYLI%20K%C3%9CB-DEKSTROZ%2010.pdf_c78ad950-6851-4ef5-a249-74b67ccd9cc1.pdf"),A(0.2,"PF %20 Dekstroz (Türkiye)",undefined,"https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/TITCK-ONAYLI%20K%C3%9CB-DEKSTROZ%2020.pdf_231b0733-4408-4dff-87f3-8496563f03c8.pdf"),A(0.3,"PF %30 Dekstroz (Türkiye)","Çocuklarda hipertonik çözeltiyi seyreltip kullanın (ör. eşit hacim steril su/SF ile yarıya)","https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/TITCK-ONAYLI%20K%C3%9CB-DEKSTROZ%2030.pdf_92fcf461-4047-426e-b4ba-6da8240a5fda.pdf"),A(0.5,"%50 Dekstroz (İE / Polifleks, Türkiye)","Çocuklarda eşit hacim steril su/SF ile %25'e seyreltin","https://titck.gov.tr/storage/kubKtAttachments/e7d876b446645.pdf")]},
+  magnezyum:{grup:"Alerji ve solunum",ad:"Magnezyum sülfat",endikasyon:"Ağır astım",dozMgKg:[25,50],dozMaxMg:2000,sik:"Tek doz",hiz:"15–30 dk infüzyon",url:U.rch,kaynak:"PALS/RCH: 25–50 mg/kg, en fazla 2 g (Türkiye KÜB'lerinde çocuk astım dozu yok; KÜB eklampsi/tokoliz endikasyonlu)",ampul:[A(150,"Magnezyum Sülfat Osel %15 ampul, 10 mL (Türkiye)","Seyreltip infüzyonla verin; infüzyon çözeltisi konsantrasyonu için ürün KÜB'üne bakın (KÜB'de %20'den söz edilir)","https://titck.gov.tr/storage/Archive/2021/kubKtAttachments/MAGNEZYUMSLFATOSEL15I.M.I.V.EnjeksiyonlukzeltierenAmpulKB_65310ff7-38f2-423b-9770-a1926d6b2afe.pdf"),A(150,"Magnezyum Sülfat Biosel %15 ampul, 10 mL (Türkiye)","Seyreltip infüzyonla verin; infüzyon çözeltisi konsantrasyonu için ürün KÜB'üne bakın (KÜB'de %20'den söz edilir)","https://titck.gov.tr/storage/kubKtAttachments/938497d064468.pdf"),A(150,"Magnezyum Sülfat Farmalas %15 ampul, 10 mL (Türkiye)","Seyreltip infüzyonla verin; infüzyon çözeltisi konsantrasyonu için ürün KÜB'üne bakın (KÜB'de %20'den söz edilir)","https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/T%C4%B0TCK%20K%C3%9CB.pdf_73772353-73a9-4804-8d52-490bc91c5edc.pdf")]},
+  adrenalin_im:{grup:"Alerji ve solunum",ad:"Adrenalin IM",endikasyon:"Anafilaksi",dozMgKg:[0.01,0.01],dozMaxMg:0.3,sik:"5–15 dk arayla tekrarlanabilir",hiz:"Uyluk dış yüz, IM",not:"Bazı protokollerde tek doz sınırı 0,5 mg (adolesan).",url:U.rch,kaynak:"PALS/RCH: 0,01 mg/kg (0,01 mL/kg), tek doz en fazla 0,3 mg",ampul:[A(1,"Adrenalin ampul 1 mg/mL (1:1000, Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf"),A(0.5,"Adrenalin ampul ½'lik 0,5 mg/mL (Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf"),A(0.25,"Adrenalin ampul ¼'lük 0,25 mg/mL (Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf")]},
+  deksametazon:{grup:"Alerji ve solunum",ad:"Deksametazon",endikasyon:"Astım, krup",dozMgKg:[0.6,0.6],dozMaxMg:16,sik:"Astımda 24 saat sonra 2. doz",hiz:"IV/IM",url:U.ast,kaynak:"0,6 mg/kg, en fazla 16 mg",ampul:[A(4,"Deksamet 8 mg ampul (8 mg/2 mL varsayımı, hastane listesi, Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.LS.26%20TEMEL%20%C4%B0LA%C3%87%20VE%20SERUM%20L%C4%B0STES%C4%B0_1711091010177082.pdf")]},
+  metilprednizolon:{grup:"Alerji ve solunum",ad:"Metilprednizolon",endikasyon:"Astım, anafilaksi",dozMgKg:[1,2],dozMaxMg:60,sik:"Hekim belirler",hiz:"IV/IM",url:U.rch,kaynak:"RCH: 1–2 mg/kg, tek doz en fazla 60 mg",not:"IV için yalnızca sodyum süksinat tuzu kullanılır; asetat (depo) flakon IM içindir.",ampul:[A(40,"Metilprednizolon sodyum süksinat 40 mg flakon (Türkiye ürün adı doğrulanmadı)","1 mL çözücü ile 40 mg/mL")]},
+  midazolam:{grup:"Nöbet",ad:"Midazolam IV/IO",endikasyon:"Status epileptikus",dozMgKg:[0.1,0.2],dozMaxMg:10,sik:"5 dk sonra bir kez tekrarlanabilir",hiz:"Yavaş IV/IO",konsUyari:{kg:15,mgMl:1,metin:"15 kg altı çocuklarda 1 mg/mL'den yüksek konsantrasyon önerilmez; 1 mg/mL'ye seyreltin (Dormicum KÜB)."},not:"Solunum depresyonuna hazırlıklı olun. Kaynaklarda IV doz 0,1–0,2 mg/kg arasında değişiyor.",url:U.cps,kaynak:"CPS/PEAK/ERC: 0,1–0,2 mg/kg, en fazla 10 mg",ampul:[A(1,"Dormicum 5 mg/5 mL ampul (Deva, Türkiye)",undefined,"https://deva.com.tr/uploads/product_files/05072013135443.pdf"),A(5,"Demizolam 15 mg ampul (3 mL varsayımı, Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.LS.26%20TEMEL%20%C4%B0LA%C3%87%20VE%20SERUM%20L%C4%B0STES%C4%B0_1711091010177082.pdf")]},
+  diazepam:{grup:"Nöbet",seyreltilmez:true,ad:"Diazepam IV",endikasyon:"Status epileptikus",dozMgKg:[0.2,0.3],dozMaxMg:10,sik:"Bir kez tekrarlanabilir",hiz:"Yavaş IV",maxYas:[[0,60,5],[60,100000,10]],not:"5 yaş altında tek doz en fazla 5 mg, 5 yaş ve üzerinde en fazla 10 mg (CPS, Diazem KÜB).",url:U.cps,kaynak:"CPS/UnityPoint: 0,2–0,3 mg/kg, en fazla 10 mg",ampul:[A(5,"Diazem 10 mg/2 mL ampul (Deva, Türkiye)",undefined,"https://ilacabak.com/diazem-10-mg-2-ml-i-m-i-v-enjeksiyonluk-cozelti-iceren-ampul-10-ampul-1886")]},
+  fenitoin:{grup:"Nöbet",ad:"Fenitoin",endikasyon:"Status epileptikus (2. basamak)",dozMgKg:[20,20],dozMaxMg:1000,sik:"Tek yükleme dozu",hiz:"1 mg/kg/dk (en fazla 1 mL = 50 mg/dk), yaklaşık 20 dk",not:"EKG ve tansiyon izlenir. Yalnızca SF ile seyreltin, başka ilaçlarla karıştırmayın (Epitoin KÜB).",url:U.cps,kaynak:"CPS/PEAK: 20 mg/kg, en fazla 1000 mg",ampul:[A(50,"Epitoin 250 mg/5 mL ampul (VEM, Türkiye)","SF ile seyreltin; son konsantrasyon en fazla 10 mg/mL","https://titck.gov.tr/storage/Archive/2021/kubKtAttachments/EPTON250mg5mlI.M.I.V.EnjeksiyonlukzeltierenAmpulKB_79fa2423-051d-4288-8197-f907aefae49a.pdf")]},
+  levetirasetam:{grup:"Nöbet",ad:"Levetirasetam",endikasyon:"Status epileptikus (2. basamak)",dozMgKg:[40,60],dozMaxMg:3000,sik:"Tek yükleme dozu",hiz:"Seyreltip yaklaşık 5 dk",not:"Bazı protokollerde en fazla 4500 mg.",yasUyari:{ay:48,metin:"Keppra infüzyon KÜB'ünde 4 yaş altı için ayrı bir bölüm bulunur; kullanmadan önce KÜB'ü kontrol edin."},url:U.sz,kaynak:"ERC/PEAK: 40–60 mg/kg, en fazla 3000 mg",ampul:[A(100,"Keppra 500 mg/5 mL konsantre infüzyon flakonu (Türkiye)","Seyreltip verin","https://titck.gov.tr/storage/Archive/2021/kubKtAttachments/500flkkub_25471439-87d0-48eb-8bd4-91c202ab8e44.pdf")]},
+  parasetamol_a:{grup:"Ağrı ve sedasyon",paraGun:{kg:30},ad:"Parasetamol IV (10 kg ve altı)",kiloAralik:[0,10],dozMgKg:[7.5,7.5],dozMaxMg:75,sik:"Günde en fazla 4 kez; günlük en fazla 30 mg/kg",hiz:"15 dk infüzyon",not:"mg ile mL karışıklığı 10 kat doz aşımına yol açmıştır: ampul 10 mg/mL.",url:U.pf,kaynak:"Perfalgan SmPC: ≤10 kg 7,5 mg/kg",ampul:[A(10,"A-Per 10 mg/mL IV infüzyonluk çözelti (Türkiye)",undefined,"https://www.ilacabak.com/a-per-10-mg-ml-i-v-infuzyonluk-cozelti-12-flakon-27619/benzerleri")]},
+  parasetamol_b:{grup:"Ağrı ve sedasyon",paraGun:{kg:60,mg:[2000,3000],esik:33},ad:"Parasetamol IV (10–50 kg)",kiloAralik:[10,50],dozMgKg:[15,15],dozMaxMg:750,sik:"Günde en fazla 4 kez; günlük en fazla 60 mg/kg (≤33 kg: en fazla 2 g, 33–50 kg: en fazla 3 g)",hiz:"15 dk infüzyon",not:"mg ile mL karışıklığı 10 kat doz aşımına yol açmıştır: ampul 10 mg/mL.",url:U.pf,kaynak:"Perfalgan SmPC: >10–50 kg 15 mg/kg",ampul:[A(10,"A-Per 10 mg/mL IV infüzyonluk çözelti (Türkiye)",undefined,"https://www.ilacabak.com/a-per-10-mg-ml-i-v-infuzyonluk-cozelti-12-flakon-27619/benzerleri")]},
+  ondansetron_iv:{grup:"Bulantı",ad:"Ondansetron IV",endikasyon:"Bulantı, kusma",dozMgKg:[0.1,0.1],dozMaxMg:4,sik:"Hekim belirler",hiz:"2–5 dk'da yavaş IV",minAy:6,minAyKaynak:"SF EMS protokolü: 6 ay–12 yaş için 0,1 mg/kg",url:U.sf,kaynak:"SF EMS: 0,1 mg/kg, en fazla 4 mg",ampul:[A(2,"Zofran 4 mg/2 mL ampul (Sandoz, Türkiye)",undefined,"https://www.ilacabak.com/zofran-4-mg-2-ml-1-ampul-24152"),A(2,"Zofran 8 mg/4 mL ampul (Sandoz, Türkiye)",undefined,"https://www.ilacabak.com/zofran-8-mg-4-ml-1-ampul-24156")]},
+  morfin:{grup:"Ağrı ve sedasyon",ad:"Morfin IV",endikasyon:"Şiddetli ağrı",trKub:true,dozMgKg:[0.025,0.1],dozMaxMg:4,sik:"KÜB: gerekirse 5–10 dakikada bir 0,025 mg/kg bolus",hiz:"Yavaş IV",not:"Solunum depresyonu: monitorize edin, naloksan hazır tutun.",yasUyari:{ay:12,metin:"Morfin KT: 1 yaş altı çocuklara, yenidoğan ve prematüre bebeklere ameliyat öncesi dönemde verilmemelidir; diğer kullanımlarda dikkatli olun."},url:"https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/TITCK-MORF%C4%B0N-UYGUN%20KUB.pdf_3bde8ca4-42b7-4950-9a7a-36fa8b060562.pdf",kaynak:"Morfin Osel KÜB: IV başlangıç 0,025–0,1 mg/kg; IM/SC çocukta 0,1–0,2 mg/kg (en fazla 15 mg); tek doz üst sınırı 4 mg protokol değeridir",ampul:[A(10,"Morfin Hidroklorür Osel 10 mg/mL ampul, 1 mL (Türkiye)","1 mg/mL'ye seyreltin: 1 mL + 9 mL SF","https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/TITCK-MORF%C4%B0N-UYGUN%20KUB.pdf_3bde8ca4-42b7-4950-9a7a-36fa8b060562.pdf")]},
+  fentanil:{grup:"Ağrı ve sedasyon",ad:"Fentanil IV",endikasyon:"Şiddetli ağrı",u:"mcg",dozMgKg:[1,1],dozMaxMg:50,sik:"0,5 mcg/kg tekrar (en fazla 25 mcg); toplam en fazla 100 mcg",hiz:"1 dk'da yavaş IV",not:"Solunum depresyonu: monitorize edin.",url:U.sf,kaynak:"SF EMS: 1 mcg/kg, en fazla 50 mcg",ampul:[A(50,"Fentanil sitrat 0,05 mg/mL ampul (10 mL, hastane listesi, Türkiye)",undefined,"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.LS.26%20TEMEL%20%C4%B0LA%C3%87%20VE%20SERUM%20L%C4%B0STES%C4%B0_1711091010177082.pdf")]},
+  ketamin_agri:{grup:"Ağrı ve sedasyon",ad:"Ketamin IV (ağrı)",endikasyon:"Subdissosiyatif analjezi",dozMgKg:[0.2,0.3],dozMaxMg:30,sik:"Hekim belirler",hiz:"1 dk'da yavaş IV",minAy:12,minAyKaynak:"Ada County pediatrik ağrı protokolü: 1 yaş altında kullanılmaz",url:U.ada,kaynak:"0,2–0,3 mg/kg IV, en fazla 30 mg",ampul:[A(50,"Ketalar 500 mg/10 mL flakon (Pfizer, Türkiye)","Seyreltip verin","https://titck.gov.tr/storage/Archive/2020/kubKtAttachments/TITCKKETALARUYGUNKB_6d449000-92af-4327-a5f9-08c222a0517f.pdf")]},
+  ketamin_sed:{grup:"Ağrı ve sedasyon",trKub:true,ad:"Ketamin IV (sedasyon/indüksiyon)",endikasyon:"Sedasyon, anestezi indüksiyonu",dozMgKg:[1,2],dozMaxMg:null,sik:"Sonrasında 0,5 mg/kg her 5–15 dk (kaynağa göre)",hiz:"60 sn'de yavaş IV (veya 0,5 mg/kg/dk; Ketalar KÜB)",yasUyari:{ay:12,metin:"Kaynaklarda net yaş alt sınırı bulunamadı; 1 yaş altında kullanım uzman kararı gerektirir. Pediatrist yaş sınırını belirlemeli."},not:"Yalnızca havayolu yönetimi bilen ekip kullanmalıdır. KÜB'de IV başlangıç dozu 4,5 mg/kg'a kadar çıkabilir; bu araç 1–2 mg/kg gösterir. Mg cinsinden üst sınır kaynaklarda tanımlı değil.",url:U.um,kaynak:"UMass: 1–2 mg/kg IV; Ketalar KÜB: IV başlangıç 1–4,5 mg/kg (ortalama 2 mg/kg)",ampul:[A(50,"Ketalar 500 mg/10 mL flakon (Pfizer, Türkiye)",undefined,"https://titck.gov.tr/storage/Archive/2020/kubKtAttachments/TITCKKETALARUYGUNKB_6d449000-92af-4327-a5f9-08c222a0517f.pdf")]}
+};
+function sekme(n) {
+  $("oral").hidden = n !== "oral"; $("iv").hidden = n !== "iv"; $("zh").hidden = n !== "zh";
+  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === n));
+}
+$("tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) sekme(b.dataset.t); });
+function ivFillIlac() {
+  const k = Object.keys(ILAC_IV), g = {};
+  k.forEach(x => (g[ILAC_IV[x].grup] = g[ILAC_IV[x].grup] || []).push(x));
+  $("ivilac").innerHTML = k.length ? Object.entries(g).map(([n, l]) => `<optgroup label="${bas(n)}">${l.map(x => `<option value="${x}">${bas(ILAC_IV[x].ad)}</option>`).join("")}</optgroup>`).join("") : '<option value="">Henüz ilaç eklenmedi</option>';
+  $("ivilac").insertAdjacentHTML("beforeend", '<optgroup label="Antibiyotikler">' + Object.entries(ABX).map(([k, v]) => '<option value="abx:' + k + '">' + bas(v.ad) + '</option>').join("") + '</optgroup>');
+  ivFillAmpul();
+}
+function ivFillAmpul() {
+  if (isAbx()) { abxFillDrug(); return; }
+  $("ivendikW").hidden = true; $("ivsikW").hidden = true;
+  const d = ILAC_IV[$("ivilac").value];
+  $("ivampul").innerHTML = d ? d.ampul.map((a, i) => `<option value="${i}">${f(a.mgMl, 2)} ${d.u || "mg"}/mL · ${a.urun}</option>`).join("") : '<option value="">-</option>';
+  ivHesapla();
+}
+function ivHesapla() {
+  if (isAbx()) return abxHesapla();
+  const out = $("ivsonuc"), d = ILAC_IV[$("ivilac").value];
+  if (!d) { out.innerHTML = '<div class="empty">Bu bölüm hazır. Kaynakla doğrulanmış acil ilaçlar eklendikçe burada görünecek.</div>'; return; }
+  if (!$("kiloIv").value.trim()) { out.innerHTML = '<div class="empty">Kiloyu seçince sonuç burada görünür.</div>'; return; }
+  const w = num($("kiloIv").value), bad = m => { out.innerHTML = `<div class="msg bad" style="margin:0">${m}</div>`; };
+  if (isNaN(w) || w < 1 || w > 80) return bad("Kilo 1–80 kg aralığında olmalı. Bu araç bu aralık dışında doz önermez.");
+  const yas = $("yasIv").value.trim() === "" ? null : num($("yasIv").value);
+  if (yas !== null && (isNaN(yas) || yas < 0)) return bad("Yaş çubuğunu ayarlayın ya da temizleyin.");
+  if (d.minAy && yas !== null && yas < d.minAy) return bad(`${d.ad} ${d.minAy} aylıktan küçük çocuklarda önerilmez (${d.minAyKaynak}). Bu araç doz önermez.`);
+  if (d.kiloAralik && !(w > d.kiloAralik[0] && w <= d.kiloAralik[1])) return bad(`${d.ad} yalnızca ${d.kiloAralik[0]}–${d.kiloAralik[1]} kg arası içindir. Listeden kilonuza uygun seçeneği seçin.`);
+  const a = d.ampul[+$("ivampul").value], u = d.u || "mg", notes = [];
+  if (yas !== null) { const uy = uyum(w, yas); if (uy) notes.push(uy); }
+  let lo = d.dozMgKg[0] * w, hi = d.dozMgKg[1] * w, dmax = d.dozMaxMg;
+  if (d.maxYas) { const m = d.maxYas.find(x => yas !== null && yas >= x[0] && yas < x[1]); dmax = m ? m[2] : d.maxYas[0][2]; if (yas === null) notes.push(`Yaş girilmedi; en düşük üst sınır (${f(dmax, 2)} ${u}) uygulandı.`); }
+  else if ((d.minAy || d.yasUyari) && yas === null) notes.push("Yaş girilmedi; yaş sınırı kontrol edilmedi.");
+  if (d.yasUyari && yas !== null && yas < d.yasUyari.ay) notes.push(d.yasUyari.metin);
+  if (d.konsUyari && w < d.konsUyari.kg && a.mgMl > d.konsUyari.mgMl) notes.push(d.konsUyari.metin);
+  if (d.dozMinMg && lo < d.dozMinMg) { lo = Math.max(lo, d.dozMinMg); hi = Math.max(hi, d.dozMinMg); notes.push(`Hesaplanan doz alt sınırın (${f(d.dozMinMg, 2)} ${u}) altında kaldığı için alt sınıra çıkarıldı.`); }
+  if (dmax && hi > dmax) { hi = dmax; lo = Math.min(lo, hi); notes.push(`Hesaplanan doz üst sınırı (${f(dmax, 2)} ${u}) aştığı için sınıra indirildi.`); }
+  if (d.paraGun) paraNotlari(notes);
+  const vlo = lo / a.mgMl, vhi = hi / a.mgMl;
+  if (vlo < 0.1) notes.push(d.seyreltilmez ? "Hesaplanan hacim 0,1 mL'nin altında; güvenle ölçülemez. Bu ilaç seyreltilmemelidir; ürün KÜB'ünü kontrol edin ve hassas (1 mL) enjektör kullanın." : `Hesaplanan hacim ${rng(vlo, vhi, 3)} mL; 0,1 mL'nin altı güvenle ölçülemez. Seyreltme gerekiyorsa ilacın KÜB'ündeki talimata uyun. 1:10 seyreltik çözeltiden (1 mL ilaç + 9 mL SF) alınacak hacim: ${rng(vlo * 10, vhi * 10, 2)} mL.`);
+  const dec = u === "mcg" ? 0 : 2, sey = a.seyreltme || d.seyreltme;
+  out.innerHTML = `
+    <div class="lbl">${bas(d.ad)}, ${f(w, 1)} kg${yas !== null ? ", " + f(yas, 0) + " ay" : ""}${d.endikasyon ? " · " + d.endikasyon : ""}</div>
+    <div class="big">${rng(lo, hi, dec)} <small>${u}</small></div>
+    <div class="big">${rng(lo / a.mgMl, hi / a.mgMl, 2)} <small>mL (${f(a.mgMl, 2)} ${u}/mL)</small></div>
+    <dl><dt>Tekrar</dt><dd>${d.sik || "-"}</dd><dt>Veriliş</dt><dd>${d.hiz || "-"}</dd>${sey ? `<dt>Seyreltme</dt><dd>${sey}</dd>` : ""}${/infüzyon/i.test(d.hiz || "") ? "" : `<dt>Enjektör</dt><dd>${enjBoyu(vhi)}</dd>`}</dl>
+    ${uyKart([d.not, ...notes])}
+    ${hesapKutu([`${f(w, 1)} kg × ${rng(d.dozMgKg[0], d.dozMgKg[1], 3)} ${u}/kg = ${rng(d.dozMgKg[0] * w, d.dozMgKg[1] * w, dec)} ${u}`, (d.dozMinMg || d.dozMaxMg) ? `Alt/üst sınırlar uygulanınca: ${rng(lo, hi, dec)} ${u}` : "", `${rng(lo, hi, dec)} ${u} ÷ ${f(a.mgMl, 2)} ${u}/mL = ${rng(vlo, vhi, 2)} mL`])}
+    ${kaynakKutu(!!d.trKub, `Ampul: ${a.url ? `<a href="${a.url}" target="_blank" rel="noopener">${a.urun}</a>` : a.urun}<br>Doz: <a href="${d.url}" target="_blank" rel="noopener">${d.kaynak}</a><br>Ampul konsantrasyonunu elinizdeki ürünün etiketinden kontrol edin.`)}`;
+}
+$("ivilac").addEventListener("change", ivFillAmpul);
+$("ivampul").addEventListener("change", ivHesapla);
+$("kiloIv").addEventListener("input", ivHesapla);
+$("yasIv").addEventListener("input", ivHesapla);
+// ---- IV antibiyotik bölümü (Acil IV içinde "Antibiyotikler" grubu; Türkiye KÜB'leri). mgMl yoksa mL gösterilmez, flakon oranı gösterilir.
+const AB = (mgMl, urun, flakonMg, hazirlama, url, extra) => Object.assign({mgMl, urun, flakonMg, hazirlama, url}, extra || {});
+const ABX = {
+  seftriakson:{aile:"sef",bobrek:"uyari",ad:"Seftriakson",minAy:1,minAyMetin:"1 aydan küçüklerde doz yaşa (gün) göre değişir: 14 güne kadar günde tek doz 20–50 mg/kg, günlük en fazla 50 mg/kg; 28 günden küçüklerde IV kalsiyumla birlikte kontrendikedir (KÜB). Bu araç 1 ay altında doz önermez.",
+    blokUst:{kg:50,ay:144,metin:"12 yaş üstü veya 50 kg ve üzeri: KÜB erişkin dozunu uygular; bu araç doz önermez."},
+    endik:[{ad:"Genel enfeksiyon (15 gün–12 yaş)",gun:[20,80]},{ad:"Bakteriyel menenjit",gun:[100,100],gunMaxMg:4000}],
+    sik:[{n:1,saat:24}],hiz:"Süre ve seyreltme için ürün KÜB 4.2'ye bakın",
+    not:"Kalsiyum içeren çözeltilerle (Ringer, Hartmann) seyreltilmez ve aynı hattan kalsiyumla birlikte verilmez. Sefalosporin alerjisinde kullanılmaz; penisilin alerjisinde çapraz reaksiyon olabilir.",
+    kaynak:"Günde tek doz 20–80 mg/kg (15 gün–12 yaş); menenjitte 100 mg/kg, en fazla 4 g (Unacefin, Forsef, Rocephin TİTCK KÜB)",
+    urunler:[AB(100,"Unacefin 1 g IV flakon (Türkiye)",1000,"1 g flakon + 10 mL enjeksiyonluk su (kutudaki çözücü) → yaklaşık 100 mg/mL","https://titck.gov.tr/storage/kubKtAttachments/cPnBDsCEGVRdGw.pdf"),
+             AB(100,"Unacefin 0,5 g IV flakon (Türkiye)",500,"500 mg flakon + 5 mL enjeksiyonluk su → yaklaşık 100 mg/mL","https://titck.gov.tr/storage/kubKtAttachments/tMYCBIUUM3KSS.pdf"),
+             AB(100,"Forsef 1 g IV flakon (Türkiye)",1000,"IV enjeksiyon için 1 g flakon 10 mL ile hazırlanır (KÜB)","https://titck.gov.tr/storage/kubKtAttachments/38gEiZ8G1OdLF.pdf")]},
+  sefazolin:{aile:"sef",bobrek:"uyari",ad:"Sefazolin",minAy:1,minAyMetin:"Prematüre ve 1 aylıktan küçük bebeklerde etkinlik ve güvenlilik belirlenmemiştir (KÜB). Bu araç doz önermez.",
+    endik:[{ad:"Hafif–orta enfeksiyon (25–50 mg/kg/gün)",gun:[25,50]},{ad:"Ağır enfeksiyon (100 mg/kg/güne kadar)",gun:[25,100]}],
+    sik:[{n:3,saat:8},{n:4,saat:6}],hiz:"Hazırlanıp 50–100 mL %0,9 NaCl veya %5 dekstroz + %0,9 NaCl ile seyreltilerek aralıklı infüzyon (KÜB)",
+    not:"KÜB: günlük doz 3 veya 4 eşit doza bölünür. Böbrek yetmezliğinde doz ayarlanır. Sefalosporin alerjisinde kullanılmaz; penisilin alerjisinde çapraz reaksiyon olabilir.",
+    kaynak:"25–50 mg/kg/gün, 3–4 eşit doz; ağır enfeksiyonda 100 mg/kg/güne kadar (Eqizolin, Sefamax, Cefamezin TİTCK KÜB)",
+    urunler:[AB(null,"Eqizolin 1 g IM/IV flakon (Türkiye)",1000,"IV için KÜB'ün intravenöz enjeksiyon bölümüne göre sulandırın","https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/EQ%C4%B0ZOL%C4%B0N%201%20g%20IM-IV%20enjeksiyonluk%20toz-%20Onayl%C4%B1%20K%C3%9CB.pdf_5a883b8c-6738-481c-8f17-ee05658aeb3a.pdf"),
+             AB(null,"Sefamax 1 g IM/IV flakon (Türkiye)",1000,"IV için KÜB'ün intravenöz enjeksiyon bölümüne göre sulandırın","https://titck.gov.tr/storage/kubKtAttachments/12d67bc584522.pdf"),
+             AB(null,"Cefamezin 1000 mg IM/IV flakon (Türkiye)",1000,"IV için KÜB'ün intravenöz enjeksiyon bölümüne göre sulandırın","https://sanofi.com/assets/countries/turkey/docs/products/prescription-products/C/cefamezin-1000-mg-im-iv-03-01-2013-kub.pdf")]},
+  ampisilin:{aile:"pen",bobrek:"uyari",ad:"Ampisilin",minAy:1,minAyMetin:"1 aydan küçüklerde doz yaşa (gün) göre değişir: 7 günden küçük 30 mg/kg 12 saatte bir; 7–21 gün 30 mg/kg 8 saatte bir; 21–28 gün 30 mg/kg 6 saatte bir (KÜB). Bu araç 1 ay altında doz önermez.",
+    blokUst:{kg:999,ay:144,metin:"12 yaş üstü: KÜB erişkin ve genç dozunu (her 4–6 saatte bir 500 mg) uygular; bu araç doz önermez."},
+    doz:[25,50],dozMaxMg:1000,sik:[{n:4,saat:6}],hiz:"Doğrudan IV uygulama 10–15 dakikada yavaş yapılır (KÜB)",
+    not:"KÜB: enfeksiyonun ciddiyetine göre doz iki katına çıkarılabilir; bu araç standart aralığı hesaplar. Kreatinin klerensine göre ayarlanır. Penisilin alerjisinde kullanılmaz.",
+    kaynak:"1 ay–12 yaş: her 6 saatte bir 25–50 mg/kg, en fazla 1 g (Silina, Penbisin TİTCK KÜB)",
+    urunler:[AB(null,"Silina 250 mg IM/IV flakon (Türkiye)",250,"IV için ürün KÜB'üne göre sulandırın","https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/T%C4%B0TCK-UYGUN-K%C3%9CB-%20S%C4%B0L%C4%B0NA%20250MG%20ENJEKTABL%20FLAKON.pdf_a3d39773-a7b1-4e08-99fd-3fe8089eecf4.pdf"),
+             AB(null,"Silina 500 mg IM/IV flakon (Türkiye)",500,"IV için ürün KÜB'üne göre sulandırın","https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/T%C4%B0TCK-UYGUN-K%C3%9CB-%20S%C4%B0L%C4%B0NA%20500MG%20ENJEKTABL%20FLAKON.pdf_300990cb-58e8-44a9-9381-5d1c9c5f03ae.pdf"),
+             AB(null,"Penbisin 500 mg IM/IV flakon (Türkiye)",500,"IV için ürün KÜB'üne göre sulandırın","https://titck.gov.tr/storage/Archive/2020/kubKtAttachments/Penbisin500mgEnjeksiyonlukzeltiTozukb_ef6180a0-bdaf-4865-91e5-e7e1cb739eb2.pdf")]},
+  gentamisin:{bobrek:"blok",ad:"Gentamisin",
+    bant:[{ay:[0,1],ad:"Yenidoğan",gun:[4.5,7.5],n1:true},{ay:[1,12],ad:"1 ay–1 yaş",gun:[4.5,7.5]},{ay:[12,100000],ad:"1 yaş ve üzeri",gun:[3,6]}],
+    sik:[{n:1,saat:24},{n:2,saat:12}],hiz:"IM veya IV; IV için seyreltme ve süre KÜB 4.2'ye bakın",
+    not:"Serum düzeyi izlenmelidir (günde tek doz uygulamada çukur düzey 1 µg/mL'yi aşmamalı). Prematürelerde ve böbrek yetmezliğinde dikkatli kullanılır (KÜB).",
+    kaynak:"1 yaş ve üzeri 3–6 mg/kg/gün; 1 aydan büyük bebek 4,5–7,5 mg/kg/gün (1–2 doz); yenidoğan günde tek doz 4,5–7,5 mg/kg (Genmisin, Genthaver, Turktipsan TİTCK KÜB)",
+    urunler:[AB(40,"Turktipsan Gentamisin 80 mg/2 mL ampul (Türkiye)",80,"Hazır çözelti: 80 mg/2 mL = 40 mg/mL","https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/turkt%C4%B1psan%20gentamisin%2080%20mg-2%20ml%20onayl%C4%B1%20k%C3%BCb.pdf_63bb0927-9d62-4140-8fd9-aecb8a8c1eab.pdf"),
+             AB(40,"Genmisin 80 mg/2 mL ampul (Türkiye)",80,"Hazır çözelti: 80 mg/2 mL = 40 mg/mL","https://titck.gov.tr/storage/kubKtAttachments/GsZNdeab7LCxh.pdf"),
+             AB(80,"Genthaver 160 mg/2 mL ampul (Türkiye)",160,"Hazır çözelti: 160 mg/2 mL = 80 mg/mL","https://titck.gov.tr/storage/kubKtAttachments/NALWjW5uTC1BU.pdf")]},
+  penisilin:{aile:"pen",bobrek:"uyari",ad:"Penisilin G (kristalize, potasyum)",u:"IU",minAy:1,minAyMetin:"Yenidoğanlarda renal fonksiyon gelişimi tamamlanmadığından penisilin eliminasyonu gecikir; doz ve sıklık azaltılmalıdır (KÜB). Listeria enfeksiyonunda yenidoğanlara günde 500.000–1.000.000 IU verilir. Bu araç 1 ay altında doz önermez.",
+    gunMin:1000000,gunMinMetin:"KÜB: günde 1 milyon IU'nun altında doz gereken hastalarda bu ürün (1.000.000 IU flakon) uygulanmamalıdır.",
+    endik:[{ad:"Ciddi enfeksiyon (pnömoni, endokardit; duyarlı streptokok/meningokok)",gun:[150000,300000],sik:[{n:4,saat:6},{n:6,saat:4}]},
+           {ad:"Menenjit (pnömokok, meningokok)",gun:[250000,250000],gunMaxMg:12000000,sik:[{n:6,saat:4}]},
+           {ad:"Sifiliz (yenidoğan periyodundan sonra)",gun:[200000,300000],sik:[{n:6,saat:4},{n:4,saat:6}]},
+           {ad:"Difteri (antitoksine ek tedavi)",gun:[150000,250000],sik:[{n:4,saat:6}]}],
+    sik:[{n:4,saat:6},{n:6,saat:4}],hiz:"Yüksek dozlarda (10 milyon IU üzeri) IV çok yavaş verilir (KÜB); süre ve seyreltme için ürün KÜB 4.2'ye bakın",
+    not:"1 milyon IU 1,68 mEq potasyum içerir; yüksek doz IV uygulamada ciddi hiperkalemi olabilir. Ciddi böbrek yetmezliğinde doz azaltılır. Penisilin alerjisinde kullanılmaz (KÜB). Menenjitte KÜB maksimum 12–20 milyon IU/gün der; bu araç 12 milyon IU'da sınırlar.",
+    kaynak:"Ciddi enfeksiyon 150.000–300.000 IU/kg/gün (4–6 saatte bir); menenjit 250.000 IU/kg/gün (4 saatte bir); sifiliz (yenidoğan sonrası) 200.000–300.000; difteri 150.000–250.000 IU/kg/gün (Penicillin G Potasyum, Pensilina, Selsilna TİTCK KÜB)",
+    urunler:[AB(null,"Penicillin G Potasyum 1.000.000 IU flakon (Türkiye)",1000000,"Çözücü ayrı ampulde (2 mL); IV hazırlama için ürün KÜB'üne bakın","https://titck.gov.tr/storage/kubKtAttachments/b254b7a226930.pdf"),
+             AB(null,"Pensilina 1.000.000 IU IM/IV flakon (Türkiye)",1000000,"IV hazırlama için ürün KÜB'üne bakın","https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/T%C4%B0TCK%20UYGUN%20K%C3%9CB%20PENS%C4%B0L%C4%B0NA%201000000%20IU%20IM-IV%20ENJEKS%C4%B0YONLUK%20TOZ%20%C4%B0%C3%87EREN%20FLAKON.pdf_e8302bc9-7191-43e4-a387-00772f0e2551.pdf"),
+             AB(null,"Selsilna 1.000.000 IU IM/IV flakon (Türkiye)",1000000,"IV hazırlama için ürün KÜB'üne bakın","https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/TITCK-SELSILNA%20-UYGUN%20KUB.pdf_95a2338e-e41d-4683-96bc-14b0f714d103.pdf")]},
+  vankomisin:{bobrek:"blok",ad:"Vankomisin",minAy:1,minAyMetin:"1 aydan küçüklerde doz doğum sonrası yaşa ve gestasyonel yaşa göre tablolanır (KÜB, PMA tablosu). Bu araç 1 ay altında doz önermez.",
+    blokUst:{kg:999,ay:144,metin:"12 yaş üstü: KÜB erişkin dozunu (her 8–12 saatte bir 15–20 mg/kg) uygular; bu araç doz önermez."},
+    doz:[10,15],sik:[{n:4,saat:6}],hiz:"En az 60 dk'da infüzyon; 10 mg/dk'dan hızlı verilmez (KÜB)",
+    not:"Seyreltme: 500 mg başına en az 100 mL uygun sıvı (Edicin KÜB). Edicin KÜB'ü 10 mg/kg (40 mg/kg/gün) verirken yeni KÜB'ler (Vankomyl, Vankopol, Vankurais) 10–15 mg/kg yazar; seçtiğiniz ürüne göre aralık değişir. Serum düzeyi izlenir.",
+    kaynak:"6 saatte bir 10–15 mg/kg (Vankomyl KÜB); Edicin KÜB'ü 6 saatte bir 10 mg/kg",
+    urunler:[AB(50,"Edicin 500 mg IV flakon (Türkiye)",500,"500 mg flakon + 10 mL steril su → 50 mg/mL; sonra en az 100 mL ile seyreltilir","https://titck.gov.tr/storage/kubKtAttachments/30dd706e15317.pdf",{dozMgKg:[10,10]}),
+             AB(50,"Edicin 1 g IV flakon (Türkiye)",1000,"1 g flakon + 20 mL steril su → 50 mg/mL; sonra en az 100 mL ile seyreltilir (500 mg başına)","https://titck.gov.tr/storage/kubKtAttachments/36c0845826168.pdf",{dozMgKg:[10,10]}),
+             AB(null,"Vankomyl 500 mg IV flakon (Türkiye)",500,"Hazırlama için ürün KÜB'üne bakın","https://titck.gov.tr/storage/Archive/2019/kubKtAttachments/T%C4%B0TCK-ONAYLI%20K%C3%9CB-VANKOMYL500.pdf_8c9ca96b-a9d1-45c7-af43-7d15d8cb7c0a.pdf")]}
+};
+const isAbx = () => $("ivilac").value.startsWith("abx:");
+function abxFillSik() {
+  const d = ABX[$("ivilac").value.slice(4)], e = d.endik ? d.endik[+$("ivendik").value || 0] : null, L = (e && e.sik) || d.sik;
+  $("ivsik").innerHTML = L.map((x, i) => `<option value="${i}">Günde ${x.n} kez (her ${x.saat} saatte bir)</option>`).join("");
+}
+function abxFillDrug() {
+  const d = ABX[$("ivilac").value.slice(4)];
+  $("ivendikW").hidden = !d.endik; $("ivsikW").hidden = false;
+  $("ivendik").innerHTML = d.endik ? d.endik.map((e, i) => `<option value="${i}">${e.ad}</option>`).join("") : "";
+  $("ivampul").innerHTML = d.urunler.map((a, i) => `<option value="${i}">${a.urun}</option>`).join("");
+  abxFillSik();
+  abxHesapla();
+}
+function abxHesapla() {
+  const out = $("ivsonuc"), d = ABX[$("ivilac").value.slice(4)], u = d.u || "mg";
+  const bad = m => { out.innerHTML = `<div class="msg bad" style="margin:0">${m}</div>`; };
+  if (!$("kiloIv").value.trim()) { out.innerHTML = '<div class="empty">Kiloyu seçince sonuç burada görünür.</div>'; return; }
+  const w = num($("kiloIv").value), yas = $("yasIv").value.trim() === "" ? null : num($("yasIv").value);
+  if (isNaN(w) || w < 2 || w > 80) return bad("Kilo 2–80 kg aralığında olmalı. Bu araç bu aralık dışında doz önermez.");
+  if (d.minAy && yas !== null && yas < d.minAy) return bad(d.minAyMetin);
+  if (d.blokUst && (w >= d.blokUst.kg || (yas !== null && yas >= d.blokUst.ay))) return bad(d.blokUst.metin);
+  const e = d.endik ? d.endik[+$("ivendik").value || 0] : null, a = d.urunler[+$("ivampul").value || 0], notes = [];
+  let band = null;
+  if (d.bant) {
+    if (yas === null) return bad("Bu ilaç yaşa göre dozlanır; yaş çubuğunu ayarlayın.");
+    band = d.bant.find(b => yas >= b.ay[0] && yas < b.ay[1]);
+    if (!band) return bad("Bu yaş için doz tanımlı değil.");
+  }
+  const L = (e && e.sik) || d.sik;
+  let s = L[Math.min(+$("ivsik").value || 0, L.length - 1)];
+  if (band && band.n1 && s.n !== 1) { s = L[0]; notes.push("Yenidoğanda KÜB günde tek doz önerir; günde 1 kez gösteriliyor."); }
+  if (yas === null && (d.minAy || d.blokUst)) notes.push("Yaş girilmedi; yaş sınırı kontrol edilmedi.");
+  else if (yas !== null) { const uy = uyum(w, yas); if (uy) notes.push(uy); }
+  const per = a.dozMgKg || d.doz, gun = band ? band.gun : (e ? e.gun : d.gun);
+  let lo, hi;
+  if (per) { lo = per[0] * w; hi = per[1] * w; } else { lo = gun[0] * w / s.n; hi = gun[1] * w / s.n; }
+  const dmax = d.dozMaxMg;
+  if (dmax && hi > dmax) { hi = dmax; lo = Math.min(lo, hi); notes.push(`Hesaplanan doz üst sınırı (${f(dmax)} ${u}) aştığı için sınıra indirildi.`); }
+  let gLo = lo * s.n, gHi = hi * s.n;
+  const gmax = (e && e.gunMaxMg) || d.gunMaxMg;
+  if (gmax && gHi > gmax) { gHi = gmax; hi = gmax / s.n; lo = Math.min(lo, hi); gLo = Math.min(gLo, gHi); notes.push(`Hesaplanan günlük doz üst sınırı (${f(gmax)} ${u}) aştığı için sınıra indirildi.`); }
+  if (d.gunMin && gLo < d.gunMin) notes.push(d.gunMinMetin);
+  const dec = hi < 10 ? 2 : hi < 100 ? 1 : 0;
+  out.innerHTML = `
+    <div class="lbl">${bas(d.ad)}${e ? " · " + e.ad : ""}, ${f(w, 1)} kg${yas !== null ? ", " + fmtYas(yas) : ""}${band ? " · " + band.ad : ""}</div>
+    <div class="rx">Günde ${s.n} kez · her ${s.saat} saatte bir</div>
+    <div class="big">${rng(lo, hi, dec)} <small>${u} / doz</small></div>
+    ${a.mgMl ? `<div class="big">${rng(lo / a.mgMl, hi / a.mgMl, 2)} <small>mL / doz (${f(a.mgMl, 0)} ${u}/mL)</small></div>` : ""}
+    <dl><dt>Günlük Toplam</dt><dd>${rng(gLo, gHi, gHi < 100 ? 1 : 0)} ${u}</dd><dt>Flakon</dt><dd>${rng(lo / a.flakonMg, hi / a.flakonMg, 2)} flakon / doz</dd><dt>Veriliş</dt><dd>${d.hiz}</dd><dt>Hazırlama</dt><dd>${a.hazirlama}</dd>${(a.mgMl && !/infüzyon/i.test(d.hiz || "")) ? `<dt>Enjektör</dt><dd>${enjBoyu(hi / a.mgMl)}</dd>` : ""}</dl>
+    ${uyKart([d.not, ...notes])}
+    ${hesapKutu([per ? `${f(w, 1)} kg × ${rng(per[0], per[1], 2)} ${u}/kg/doz = ${rng(per[0] * w, per[1] * w, dec)} ${u}` : `${f(w, 1)} kg × ${rng(gun[0], gun[1], 2)} ${u}/kg/gün ÷ ${s.n} doz = ${rng(gun[0] * w / s.n, gun[1] * w / s.n, dec)} ${u}`, (dmax || gmax) ? `Üst sınırlar uygulanınca: ${rng(lo, hi, dec)} ${u} / doz` : "", `× ${s.n} doz = ${rng(gLo, gHi, dec)} ${u} / gün`, a.mgMl ? `${rng(lo, hi, dec)} ${u} ÷ ${f(a.mgMl, 0)} ${u}/mL = ${rng(lo / a.mgMl, hi / a.mgMl, 2)} mL / doz` : ""])}
+    ${kaynakKutu(true, `Ürün: <a href="${a.url}" target="_blank" rel="noopener">${a.urun}</a><br>Doz: ${d.kaynak}<br>Seyreltme ve veriliş süresi için ürün KÜB'üne bakın.`)}`;
+}
+$("ivendik").addEventListener("change", () => { if (isAbx()) abxFillSik(); ivHesapla(); });
+$("ivsik").addEventListener("change", ivHesapla);
+ivFillIlac();
+
+// ---- Zehirlenme bölümü (karar desteği). u: birim; doz: mg/kg; dog: "KÜB" = Türkiye KÜB ile karşılaştırıldı, "protokol" = literatür/rehber
+const ZK = {ank:"Ankara Üniv. Akut Zehirlenmeler ders notu", wik:"WikEM antidot tabloları", eus:"EUS toksikoloji özeti", opn:"Pediatrik toksikoloji özeti (open-exam-prep)", acil:"acilci.net toksikoloji kartları"};
+const ZH = {
+  parasetamol:{ad:"Parasetamol zehirlenmesi",
+    ozet:"Akut alımda toksik eşik 150 mg/kg'ın üzeridir. Rumack-Matthew nomogramı yalnızca tek akut alımda ve alımdan en az 4 saat sonra geçerlidir; tedaviye nomogram ve karaciğer testleriyle karar verilir.",
+    esik:{etiket:"Alınan Miktar (mg Parasetamol)",sinirlar:[[150,"150 mg/kg: akut toksik eşik"]]},
+    once:["114'ü arayın; ilaç adı, miktar ve alım saatini hazırlayın."],
+    tedavi:[
+      {ad:"Aktif kömür",u:"g",doz:[0.5,1],max:50,yol:"Oral / nazogastrik",not:"Alımdan sonra en geç ilk 1 saat içinde. Bilinç bozukluğu veya kusma varsa aspirasyon riski nedeniyle hekim karar verir. Ürün kuruma göre.",dog:"protokol",kay:ZK.ank+" (0,5–1 g/kg); "+ZK.eus+" (1 g/kg, en fazla 50 g)"},
+      {ad:"N-asetilsistein, 1. infüzyon",u:"mg",doz:[150,150],agirlikUst:110,yol:"IV, 1 saatte",urunler:[{mgMl:100,ad:"Asetilsistein 300 mg/3 mL ampul (Mucinac, Turktipsan, Nacosel, Sistecs; Türkiye)"}],dog:"KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/r1JkopAAzXi9L.pdf",kay:"Mucinac, Turktipsan, Nacosel, Sistecs KÜB: 21 saatlik IV rejim"},
+      {ad:"N-asetilsistein, 2. infüzyon",u:"mg",doz:[50,50],agirlikUst:110,yol:"IV, sonraki 4 saatte",urunler:[{mgMl:100,ad:"Asetilsistein 300 mg/3 mL ampul"}],dog:"KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/r1JkopAAzXi9L.pdf",kay:"Aynı KÜB"},
+      {ad:"N-asetilsistein, 3. infüzyon",u:"mg",doz:[100,100],agirlikUst:110,yol:"IV, sonraki 16 saatte",urunler:[{mgMl:100,ad:"Asetilsistein 300 mg/3 mL ampul"}],not:"KÜB: üçüncü infüzyondan önce hastayı klinik olarak yeniden değerlendirin. 21 saatte toplam 300 mg/kg; hesapta ağırlık en fazla 110 kg alınır. 2 yaş altında doktor kontrolünde kullanılır. Seyreltme hacmi için ürün KÜB'üne ve kurum protokolüne bakın.",dog:"KÜB",url:"https://titck.gov.tr/storage/kubKtAttachments/r1JkopAAzXi9L.pdf",kay:"Aynı KÜB"}],
+    yapma:["Nomogramı alımdan 4 saat geçmeden kullanmayın."],kaynak:"Eşik ve nomogram: "+ZK.opn+"; NAC: Türkiye KÜB"},
+  opioid:{ad:"Opioid zehirlenmesi (ayrıca klonidin)",
+    ozet:"İğne ucu gözbebeği, solunum depresyonu ve bilinç azalması. Hedef tam uyanıklık değil, yeterli solunumdur.",
+    once:["Solunum yolunu açın ve gerekirse ventilasyon sağlayın; naloksan bunun yerine geçmez."],
+    tedavi:[
+      {ad:"Naloksan, ilk doz",u:"mg",doz:[0.01,0.01],yol:"IV (olmazsa IM)",tekrar:"2–3 dakikada bir tekrarlanabilir",urunler:[{mgMl:0.4,ad:"Naloksan 0,4 mg/mL ampul (Türkiye ürünü doğrulanamadı)"}],not:"Yeterli solunum sağlanana kadar titre edin.",dog:"protokol",url:"https://spc.fimea.fi/indox/english/html/nam/humspc/1/25692801.pdf",kay:"Naloksan SmPC: çocuklarda ilk doz 0,01 mg/kg IV; "+ZK.opn},
+      {ad:"Naloksan, yanıt yoksa",u:"mg",doz:[0.1,0.1],max:2,yol:"IV",urunler:[{mgMl:0.4,ad:"Naloksan 0,4 mg/mL ampul (Türkiye ürünü doğrulanamadı)"}],not:"SmPC: yanıt yoksa sonraki doz 0,1 mg/kg; WikEM/özet: en fazla 2 mg.",dog:"protokol",url:"https://spc.fimea.fi/indox/english/html/nam/humspc/1/25692801.pdf",kay:"Naloksan SmPC; "+ZK.wik}],
+    yapma:[],kaynak:"Naloksan SmPC (Finlandiya, Singapur); "+ZK.wik},
+  organofosfat:{ad:"Organofosfat / karbamat (tarım ilacı)",
+    ozet:"Tükürük, gözyaşı, bronş sekresyonu, miyozis, bradikardi, kas fasikülasyonu. Atropin sekresyonlar kuruyana kadar titre edilir.",
+    once:["Dekontaminasyon: zehirli giysileri çıkarın, cildi sabunlu suyla yıkayın; müdahale edenler nitril veya neopren eldiven kullanmalı (lateks işe yaramaz).","114'ü arayın."],
+    tedavi:[
+      {ad:"Atropin",u:"mg",doz:[0.02,0.05],dozMin:0.1,yol:"IV",tekrar:"Her 5 dakikada dozu iki katına çıkarın; bronş sekresyonları kuruyana kadar",urunler:[{mgMl:0.25,ad:"Atropin sülfat ¼'lük 0,25 mg/mL (Türkiye)"},{mgMl:0.5,ad:"Atropin sülfat ½'lik 0,5 mg/mL (Türkiye)"},{mgMl:1,ad:"Atropin sülfat 1 mg/mL (Türkiye)"}],not:"Çok yüksek toplam dozlar gerekebilir. Ampul gücünü etiketten doğrulayın.",dog:"protokol",url:"https://hastane.ksu.edu.tr/depo/belgeler/%C4%B0Y.YD.02%20AC%C4%B0L%20DURUMDA%20KULLANILAN%20%C4%B0LA%C3%87LARIN%20DOZ%20TABLOLARI_1711081021539586.pdf",kay:ZK.acil+" (0,02–0,05 mg/kg); "+ZK.wik+" (min 0,1 mg, her 5 dk iki katı); Türkiye ampul güçleri: KSÜ doz tablosu"},
+      {ad:"Pralidoksim",u:"mg",doz:[20,50],yol:"IV, ardından 5–10 mg/kg/saat infüzyon",not:"Türkiye'de güncel ürün durumu doğrulanamadı (vaka raporlarında Contrathion adıyla geçer); kurum eczanesinden teyit edin.",dog:"protokol",kay:ZK.wik+" (pediatrik 20–50 mg/kg, ardından 5–10 mg/kg/saat)"},
+      {info:true,ad:"Nöbet",not:"Nöbette Acil IV bölümündeki midazolam veya diazepamı kullanın."}],
+    yapma:["Miyozis ve taşikardi atropini kesmek için neden değildir."],kaynak:ZK.acil+"; "+ZK.wik},
+  demir:{ad:"Demir zehirlenmesi",
+    ozet:"20 mg/kg elementer demirin üzerinde hafif sindirim sistemi belirtileri, 60 mg/kg üzerinde veya serum demiri 500 µg/dL üzerinde ya da klinik toksisitede kelasyon düşünülür.",
+    esik:{etiket:"Alınan Elementer Demir (mg)",sinirlar:[[20,"20 mg/kg: hafif GİS belirtileri beklenir"],[60,"60 mg/kg: kelasyon düşünülür"]]},
+    once:["114'ü arayın. Batın grafisinde radyoopasite varlığı önemlidir."],
+    tedavi:[
+      {ad:"Deferoksamin (Desferal), sürekli IV infüzyon",u:"mg",doz:[15,15],perHour:true,gunMaxKg:80,yol:"IV sürekli infüzyon",urunler:[{mgMl:100,ad:"Desferal 500 mg flakon (Novartis, Türkiye): 500 mg + 5 mL enjeksiyonluk su = 100 mg/mL"}],not:"KÜB: önerilen hız saatte 15 mg/kg; durum elverdiğinde (genellikle 4–6 saat sonra) azaltılır. 24 saatte toplam 80 mg/kg aşılmaz. Sulandırıldıktan sonra 3 saat içinde başlanır. İdrar pembe-turuncu renk alabilir.",dog:"KÜB",url:"https://www.novartis.com/tr-tr/sites/novartis_tr/files/DESFERAL500mgIMIVSCEnjeksiyonicinLiyofilizeTozicerenFlakon-KUB.pdf",kay:"Desferal KÜB (akut demir zehirlenmesi)"}],
+    yapma:["Aktif kömür demiri bağlamaz."],kaynak:"Eşikler: "+ZK.opn+"; Desferal: Türkiye KÜB"},
+  tca:{ad:"Trisiklik antidepresan",
+    ozet:"QRS genişlemesi, hipotansiyon, nöbet ve antikolinerjik bulgular. QRS genişlemesinde sodyum bikarbonat kullanılır.",
+    once:["114'ü arayın; EKG ile QRS süresini izleyin."],
+    tedavi:[
+      {ad:"Sodyum bikarbonat",u:"mEq",doz:[1,2],max:50,yol:"IV bolus",tekrar:"WikEM: bolusun ardından 2 mEq/kg/saat infüzyon; QRS ve pH izlenir",urunler:[{mgMl:1,ad:"Sodyum Bikarbonat %8,4 ampul, 10 mL (Drogsan, Türkiye); 1 mEq/mL"}],dog:"protokol",url:"https://titck.gov.tr/storage/kubKtAttachments/6b9e381399024.pdf",kay:ZK.wik+" (1–2 mEq/kg); Türkiye ürünü: Drogsan KÜB (1 mmol/mL)"},
+      {ad:"Aktif kömür",u:"g",doz:[0.5,1],max:50,yol:"Oral / nazogastrik",not:"Trisiklik alımından sonra en fazla ilk 1 saat içinde; nöbet ve bilinç bozukluğu aspirasyon riski taşır, hekim karar verir.",dog:"protokol",kay:ZK.ank}],
+    yapma:[],kaynak:ZK.wik+"; "+ZK.ank},
+  co:{ad:"Karbon monoksit (soba, şofben)",
+    ozet:"Baş ağrısı, bulantı, bilinç değişikliği. Pulse oksimetre yanıltıcı olabilir.",
+    once:["Hastayı hemen ortamdan uzaklaştırıp temiz havaya çıkarın; 112 ve 114'ü arayın."],
+    tedavi:[{info:true,ad:"Oksijen",not:"%100 oksijen (rezervuarlı maske) ve karboksihemoglobin ölçümü. Hiperbarik oksijen endikasyonu için 114 veya merkezle görüşün. Bu satır genel toksikoloji bilgisidir; Türkiye KÜB'üyle karşılaştırılamaz, doğrulama bekliyor."}],
+    yapma:[],kaynak:"Ortamdan uzaklaştırma: Türkiye ilk yardım kaynakları (medikalakademi, doktortakvimi)"},
+  kostik:{ad:"Kostik / korozif madde (çamaşır suyu, kezzap, kireç çözücü)",
+    ozet:"Yemek borusu ve mide hasarı riski. Spesifik antidotu yoktur.",
+    once:["Kesinlikle kusturmayın.","Ambalajı saklayın; 112 ve 114'ü arayın.","Cilt veya göz teması varsa akan suyla 15–20 dakika yıkayın."],
+    tedavi:[{info:true,ad:"Hekim kararı",not:"Endoskopi gereksinimi, aktif kömür kullanımı ve izlem hekim kararıdır; kostik alımında aktif kömür ve kusturma önerilmez (genel toksikoloji bilgisi, doğrulama bekliyor)."}],
+    yapma:["Kusturmayın."],kaynak:"Kusturma yasağı ve yıkama süresi: UZEM bilgi sayfaları, doktortakvimi, medikalakademi"},
+  hidrokarbon:{ad:"Hidrokarbon (gazyağı, benzin, tiner)",
+    ozet:"Aspirasyon (akciğer) ve sinir sistemi etkisi riski. Spesifik antidotu yoktur.",
+    once:["Kesinlikle kusturmayın.","Bulaşmış giysiyi çıkarın, cildi yıkayın; 112 ve 114'ü arayın.","Solunum belirtileri (öksürük, takipne, hırıltı) açısından izleyin."],
+    tedavi:[{info:true,ad:"Hekim kararı",not:"Aktif kömür ve mide lavajı rutin değildir; izlem süresi ve görüntüleme hekim kararıdır (genel toksikoloji bilgisi, doğrulama bekliyor)."}],
+    yapma:["Kusturmayın."],kaynak:"Kusturma yasağı: doktortakvimi, medikalakademi"}
+};
+function zhFill() { $("zhilac").innerHTML = Object.entries(ZH).map(([k, v]) => `<option value="${k}">${bas(v.ad)}</option>`).join(""); zhHesapla(); }
+function zhItem(t, w0) {
+  if (t.info) return `<div class="zt"><b>${bas(t.ad)}</b><div class="zm">${t.not}</div></div>`;
+  const w = Math.min(w0, t.agirlikUst || 1e9), notes = [];
+  let lo = t.doz[0] * w, hi = t.doz[1] * w;
+  if (t.dozMin) { lo = Math.max(lo, t.dozMin); hi = Math.max(hi, t.dozMin); }
+  if (t.max && hi > t.max) { hi = t.max; lo = Math.min(lo, hi); notes.push(`Üst sınır (${f(t.max)} ${t.u}) uygulandı.`); }
+  if (t.agirlikUst && w0 > t.agirlikUst) notes.push(`Hesapta ağırlık en fazla ${t.agirlikUst} kg alındı.`);
+  const dec = hi < 10 ? 2 : hi < 100 ? 1 : 0, per = t.perHour ? " / saat" : "";
+  const urun = (t.urunler || []).map(a => `<div class="zm">${a.ad}: <b>${rng(lo / a.mgMl, hi / a.mgMl, 2)} mL${per}</b></div>`).join("");
+  const gun = t.gunMaxKg ? `<div class="zm">24 saatte en fazla ${t.gunMaxKg} mg/kg = ${f(t.gunMaxKg * w)} ${t.u}</div>` : "";
+  const dg = bd(t.dog === "KÜB"), hs = `<div class="zm">Hesap: ${f(w, 1)} kg × ${rng(t.doz[0], t.doz[1], 3)} ${t.u}/kg${per} = ${rng(lo, hi, dec)} ${t.u}${per}</div>`;
+  return `<div class="zt"><b>${bas(t.ad)}</b><div class="zd">${rng(lo, hi, dec)} ${t.u}${per}</div><div class="zm">${t.yol || ""}${t.tekrar ? " · " + t.tekrar : ""}</div>${urun}${gun}${hs}${t.not ? `<div class="zm">${t.not}</div>` : ""}${notes.map(n => `<div class="zm">${n}</div>`).join("")}<div class="zm">${dg} · ${t.url ? `<a href="${t.url}" target="_blank" rel="noopener">kaynak</a>` : t.kay}${t.url ? " (" + t.kay + ")" : ""}</div></div>`;
+}
+function zhHesapla() {
+  const out = $("zhsonuc"), d = ZH[$("zhilac").value];
+  $("zhmikW").hidden = !d.esik;
+  if (d.esik) $("zhmiklbl").textContent = d.esik.etiket;
+  if (!$("kiloZh").value.trim()) { out.innerHTML = '<div class="empty">Kiloyu seçince sonuç burada görünür.</div>'; return; }
+  const w = num($("kiloZh").value), yas = $("yasZh").value.trim() === "" ? null : num($("yasZh").value);
+  if (isNaN(w) || w < 2 || w > 80) { out.innerHTML = '<div class="msg bad" style="margin:0">Kilo 2–80 kg aralığında olmalı.</div>'; return; }
+  let h = `<div class="lbl">${bas(d.ad)}, ${f(w, 1)} kg${yas !== null ? ", " + fmtYas(yas) : ""}</div><div class="msg warn">${d.ozet}</div>`;
+  if (yas !== null) { const uy = uyum(w, yas); if (uy) h += uyKart([uy]); }
+  const mik = num($("zhmik").value);
+  if (d.esik && !isNaN(mik) && mik > 0) {
+    const mk = mik / w, asan = d.esik.sinirlar.filter(x => mk > x[0]);
+    h += `<div class="msg ${asan.length ? "bad" : "warn"}"><b>${f(mk, 1)} mg/kg alındı.</b> ${asan.length ? "Aşılan eşik: " + asan.map(x => x[1]).join("; ") + "." : "Belirtilen eşiklerin altında."} Alım saati, kusma ve kan düzeyiyle birlikte değerlendirin; 114'ü arayın.</div>`;
+  }
+  if (d.once.length) h += `<ul class="zl">${d.once.map(x => `<li>${x}</li>`).join("")}</ul>`;
+  h += d.tedavi.map(t => zhItem(t, w)).join("");
+  if (d.yapma.length) h += `<div class="msg bad">Yapmayın: ${d.yapma.join(" ")}</div>`;
+  h += kaynakKutu(null, "Kaynak: " + d.kaynak);
+  out.innerHTML = h;
+}
+$("zhilac").addEventListener("change", zhHesapla);
+["kiloZh", "yasZh", "zhmik"].forEach(id => $(id).addEventListener("input", zhHesapla));
+zhFill();
+
+// ---- Arayüz yardımcıları (uyarı kartı, etiketler, kaynak kutusu)
+
+function bas(s) { return String(s).split(/(\s+)/).map(w => /^(ve|veya|ile)$/.test(w) ? w : w.replace(/(^|[(\-\/'"])([a-zçğıöşüâîû])/g, (m, p, c) => p + c.toLocaleUpperCase("tr"))).join(""); }
+function hesapKutu(lines) { return `<details class="kv"><summary>Hesabı Göster</summary><div class="kvi">${lines.filter(Boolean).join("<br>")}</div></details>`; }
+function enjBoyu(ml) { return ml <= 1 ? "1 mL" : ml <= 3 ? "3 mL" : ml <= 5 ? "5 mL" : ml <= 10 ? "10 mL" : ml <= 20 ? "20 mL" : "50 mL"; }
+function tahminKilo(a) { const y = a / 12; return a < 12 ? 0.5 * a + 4 : y <= 5 ? (y + 4) * 2 : y < 12 ? 3 * y + 7 : Math.min(60, 3 * y + 7); }
+function paraNotlari(notes) { notes.push("Soğuk algınlığı ilaçları dahil parasetamol içeren diğer ürünler de günlük toplama sayılır."); }
+function tumHesap() { hesapla(); ivHesapla(); zhHesapla(); }
+function uyKart(list) {
+  const KRIT = /üst sınır|indirildi|aştığı|aşar|önerilmez|önermez|kontrendike|beklenen aralığın|ölçülemez|altında|işaretli|çapraz reaksiyon/;
+  list = list.filter(Boolean); if (!list.length) return "";
+  const kr = list.some(x => KRIT.test(x));
+  return `<div class="uy${kr ? " kr" : ""}"><b>${kr ? "Dikkat" : "Notlar"}</b><ul>${list.map(x => `<li${KRIT.test(x) ? ' class="k"' : ""}>${x}</li>`).join("")}</ul></div>`;
+}
+function bd(ok) { return ok ? '<span class="bd ok">Türkiye KÜB</span>' : '<span class="bd">Protokol / literatür</span>'; }
+function kaynakKutu(ok, inner) { return `<details class="kv"><summary>${ok === null ? "" : bd(ok) + " "}Kaynak ve Doğrulama</summary><div class="kvi">${inner}</div></details>`; }
+
+// ---- Ortak kilo ve yaş: tüm sekmeler aynı çubukları kullanır
+[["kilo", ["kiloIv", "kiloZh"]], ["yas", ["yasIv", "yasZh"]]].forEach(([src, dst]) => $(src).addEventListener("input", () => dst.forEach(id => { $(id).value = $(src).value; $(id).dispatchEvent(new Event("input", {bubbles: true})); })));
+
+// ---- Son kullanılan ilaçlar (seçici çubuğunun altında)
+function makeFinder(selId) {
+  const sel = $(selId), box = document.createElement("div"), key = "doz-son-" + selId; box.className = "fdc";
+  sel.insertAdjacentElement("afterend", box);
+  let recent = []; try { recent = JSON.parse(localStorage.getItem(key) || "[]"); } catch (e) {}
+  const optText = v => { const o = Array.from(sel.options).find(x => x.value === v); return o ? o.textContent : null; };
+  function drawChips() {
+    const r = recent.filter(v => optText(v));
+    box.innerHTML = r.length ? r.map(v => `<button type="button" data-v="${v}">${optText(v)}</button>`).join("") : "";
+  }
+  box.addEventListener("click", e => { const b = e.target.closest("button[data-v]"); if (!b) return; sel.value = b.dataset.v; sel.dispatchEvent(new Event("change", {bubbles: true})); });
+  sel.addEventListener("change", () => {
+    if (!sel.value) return;
+    recent = [sel.value, ...recent.filter(v => v !== sel.value)].slice(0, 4);
+    try { localStorage.setItem(key, JSON.stringify(recent)); } catch (e) {}
+    drawChips();
+  });
+  drawChips();
+}
+makeFinder("ilac"); makeFinder("ivilac");
+
+const SONUC = ["sonuc", "ivsonuc", "zhsonuc"];
+
+// ---- Ekran dışına çıkan sonuç için alttaki özet şeridi
+function ozetGuncelle() {
+  const bar = $("ozet"), tab = ["oral", "iv", "zh"].find(t => !$(t).hidden), panel = $(tab === "oral" ? "sonuc" : tab === "iv" ? "ivsonuc" : "zhsonuc");
+  const ref = panel.querySelector(tab === "zh" ? ".zt .zd" : ".big");
+  if (!ref) { bar.hidden = true; return; }
+  const r = ref.getBoundingClientRect();
+  if (r.bottom > 0 && r.top < window.innerHeight) { bar.hidden = true; return; }
+  let txt;
+  if (tab === "zh") { const zt = ref.closest(".zt"); txt = zt.querySelector("b").textContent + " · " + ref.textContent; }
+  else { const ad = (panel.querySelector(".lbl") || {textContent: ""}).textContent.split(",")[0]; txt = ad + " · " + Array.from(panel.querySelectorAll(".big")).slice(0, 2).map(x => x.textContent.replace(/\s+/g, " ").trim()).join(" · "); }
+  bar.textContent = txt; bar.hidden = false;
+}
+$("ozet").addEventListener("click", () => { const tab = ["oral", "iv", "zh"].find(t => !$(t).hidden); $(tab === "oral" ? "sonuc" : tab === "iv" ? "ivsonuc" : "zhsonuc").scrollIntoView({behavior: "smooth", block: "start"}); });
+window.addEventListener("scroll", ozetGuncelle, {passive: true}); window.addEventListener("resize", ozetGuncelle);
+SONUC.forEach(id => new MutationObserver(ozetGuncelle).observe($(id), {childList: true}));
+$("tabs").addEventListener("click", () => setTimeout(ozetGuncelle, 0));
+
+
+// ---- Küçülen hasta çubuğu
+function hastaGuncelle() { $("hastaTamam").hidden = !$("kilo").value.trim(); }
+$("kilo").addEventListener("input", hastaGuncelle);
+$("hastaTamam").addEventListener("click", () => {
+  const k = num($("kilo").value), y = $("yas").value.trim();
+  $("hastaTxt").textContent = f(k, 1) + " kg · " + (y ? fmtYas(num(y)) : "yaş seçilmedi");
+  $("hasta").hidden = true; $("hastaOzet").hidden = false;
+});
+$("hastaDegistir").addEventListener("click", () => { $("hasta").hidden = false; $("hastaOzet").hidden = true; });
+hastaGuncelle();
+$("kiloTahmin").addEventListener("click", () => {
+  const nt = $("kiloTahminNot"), a = num($("yas").value);
+  if ($("yas").value.trim() === "" || isNaN(a)) { nt.textContent = "Önce yaşı seçin."; return; }
+  const t = tahminKilo(a); $("kiloS").value = t; $("kiloS").dispatchEvent(new Event("input", {bubbles: true}));
+  nt.textContent = "Tahmini kilo " + f(t, 1) + " kg (APLS formülü); tartı yerine geçmez. Mümkünse gerçek kiloyu kullanın.";
+});
+
+// ---- Bugünün tarihi (uygulama açıldığı gün) ve imza alanı
+const IMZA = '<img src="data:image/png;base64,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" alt="K. Atatürk imzası">';
+function tarihYaz() { $("tarih").textContent = new Date().toLocaleDateString("tr-TR", {day: "numeric", month: "long", year: "numeric"}); }
+tarihYaz();
+document.addEventListener("visibilitychange", () => { if (!document.hidden) tarihYaz(); });
+if (IMZA) { $("imza").innerHTML = IMZA; $("kim").hidden = true; }
+
+// ---- Tema: açık (Sakin Gri-Mavi) ve koyu (Gece Mavisi); ilk açılışta cihaz ayarı, düğmeyle değişirse seçim hatırlanır
+const IKON_AY = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+const IKON_GUNES = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+function temaUygula(t) {
+  document.documentElement.setAttribute("data-theme", t);
+  $("tema").innerHTML = t === "dark" ? IKON_GUNES : IKON_AY;
+  $("tema").setAttribute("aria-label", t === "dark" ? "Açık temaya geç" : "Koyu temaya geç");
+  $("tc").setAttribute("content", t === "dark" ? "#0e1622" : "#f1f4f8");
+}
+let temaKayit = null; try { temaKayit = localStorage.getItem("doz-tema"); } catch (e) {}
+const sistemKoyu = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+temaUygula(temaKayit || (sistemKoyu && sistemKoyu.matches ? "dark" : "light"));
+$("tema").addEventListener("click", () => {
+  const yeni = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  temaKayit = yeni; try { localStorage.setItem("doz-tema", yeni); } catch (e) {}
+  temaUygula(yeni);
+});
+if (sistemKoyu && sistemKoyu.addEventListener) sistemKoyu.addEventListener("change", e => { if (!temaKayit) temaUygula(e.matches ? "dark" : "light"); });
+</script>
+<script>if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {})); }</script>
+</body>
+</html>
