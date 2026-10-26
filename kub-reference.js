@@ -8,7 +8,7 @@
     sef: 'https://cdn.ilacrehberi.com/sef-250-mg5-ml-oral-suspansiyon-cffb-kub.pdf',
     bactrim: 'https://devacomtr.s3.eu-west-2.amazonaws.com/urunler/kub/bactrim-200-mg-40-mg5-ml-suspansiyon-kub-19-09-2025.pdf'
   });
-  const required = ['allergyChecked', 'renalChecked', 'indicationChecked', 'packageChecked'];
+  const required = ['allergyChecked', 'renalChecked', 'indicationChecked', 'packageChecked', 'safetyChecked', 'measuredWeight'];
   function calculate(input) {
     if (!input || !required.every(k => input[k] === true)) {
       throw new Error('Alerji, böbrek, endikasyon/duyarlılık ve ürün doğrulaması gerekli.');
