@@ -40,6 +40,13 @@ for(const product of [bactrimProduct,trimoksProduct]){
   assert.throws(()=>volumeForMg(product,NaN,'trimetoprim'),/positive/);
   assert.throws(()=>mgPerMl(product,'cefaleksin'),/missing/);
 }
+const oseltamivir=get('oseltamivir');
+assert.ok(oseltamivir && oseltamivir.products.length===2);
+const concentrations=oseltamivir.products.map(p=>mgPerMl(p)).sort((a,b)=>a-b);
+assert.deepEqual(concentrations,[6,12]);
+assert.equal(volumeForMg(oseltamivir.products.find(p=>mgPerMl(p)===6),30),5);
+assert.equal(volumeForMg(oseltamivir.products.find(p=>mgPerMl(p)===12),30),2.5);
+assert.notEqual(volumeForMg(oseltamivir.products[0],30),volumeForMg(oseltamivir.products[1],30));
 for(const c of data.candidates){
   assert.equal(c.calculatorEnabled,false);
   assert.equal(c.clinicalValidated,false);
