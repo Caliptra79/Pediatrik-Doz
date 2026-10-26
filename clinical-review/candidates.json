@@ -173,7 +173,18 @@
       "id": "laktuloz",
       "name": "Laktüloz",
       "route": "oral",
-      "products": [],
+      "products": [
+        {
+          "name": "DUPHALAC 667 mg/mL oral çözelti",
+          "mg": 667,
+          "ml": 1,
+          "source": "https://ilacprospektusleri.com/ilac/2501/duphalac-667-mg-ml-surup/kisa-urun-bilgisi",
+          "status": "formulation-confirmed",
+          "route": "oral",
+          "form": "oral-solution",
+          "unit": "mg"
+        }
+      ],
       "clinicalValidated": false,
       "calculatorEnabled": false,
       "reviewedAt": null
@@ -182,7 +193,19 @@
       "id": "makrogol-peg",
       "name": "Makrogol (PEG)",
       "route": "oral",
-      "products": [],
+      "products": [
+        {
+          "name": "CASENLAX 4 g makrogol 4000 saşe",
+          "gramsPerSachet": 4,
+          "ingredient": "makrogol 4000",
+          "source": "https://www.recordati.com.tr/kub/casenlax4.pdf",
+          "status": "formulation-confirmed",
+          "route": "oral",
+          "form": "sachet",
+          "unit": "g",
+          "note": "KÜB yaş endikasyonu: 6 ay–8 yaş; klinik doğrulama bekliyor"
+        }
+      ],
       "clinicalValidated": false,
       "calculatorEnabled": false,
       "reviewedAt": null
@@ -194,7 +217,9 @@
       "products": [],
       "clinicalValidated": false,
       "calculatorEnabled": false,
-      "reviewedAt": null
+      "reviewedAt": null,
+      "safetyNote": "PENEPIN/PENEPIN JR belirli partileri 2024 yılında geri çekilmiştir. Güncel parti, ruhsat, bulunabilirlik ve resmi KÜB kontrolü olmadan ürün bazlı hesaplama/öneri kapalı tutulur.",
+      "safetySource": "https://www.istanbuleczaciodasi.org.tr/?id=14975&page=icerikler"
     }
   ]
 }
