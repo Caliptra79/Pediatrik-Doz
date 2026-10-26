@@ -46,6 +46,7 @@
     add(p,'big');
     add(x.dosingBasis,'lbl');
     if(x.additionalPerDoseMg) add('Ayrıca '+fmt(x.additionalPerDoseMg.sulfametoksazol)+' mg sülfametoksazol / doz (TMP ve SMZ ayrı hesaplanmıştır).');
+    if(x.tmpMgPerKgDay) add('Tartılan kiloya göre TMP karşılığı: '+fmt(x.tmpMgPerKgDay)+' mg/kg/gün (KÜB yaklaşık 6 mg/kg/gün).');
     add(x.note);
     const a=document.createElement('a');
     a.href=x.source;a.target='_blank';a.rel='noopener noreferrer';
