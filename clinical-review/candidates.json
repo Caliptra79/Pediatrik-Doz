@@ -77,7 +77,22 @@
       "id": "oseltamivir",
       "name": "Oseltamivir",
       "route": "oral",
-      "products": [],
+      "products": [
+        {
+          "name": "ENFLUVİR 12 mg/mL oral süspansiyon için toz",
+          "mg": 12,
+          "ml": 1,
+          "source": "https://kub.ilacprospektusu.com/ilac/9191-enfluvir-12mg-ml-oral-suspansiyon-icin-toz-kub",
+          "status": "formulation-confirmed"
+        },
+        {
+          "name": "CYOVEL 6 mg/mL oral süspansiyon için toz",
+          "mg": 6,
+          "ml": 1,
+          "source": "https://www.prospektus.co/ilaclar/cyovel-6-mg-ml-oral-suspansiyon-hazirlamak-icin-toz/kisa-urun-bilgisi",
+          "status": "formulation-confirmed"
+        }
+      ],
       "clinicalValidated": false,
       "calculatorEnabled": false,
       "reviewedAt": null
