@@ -63,6 +63,20 @@ assert.equal(mgPerMl(atrovent),0.125);
 assert.equal(atrovent.mg*1000,atrovent.labelQuantity);
 assert.equal(atrovent.route,'inhalation');
 assert.notEqual(atrovent.route,xyzal.route);
+// Lactulose syrup is mg/mL; PEG sachet is grams per sachet, not mg/mL.
+const lactulose=get('laktuloz').products[0];
+assert.equal(lactulose.route,'oral');
+assert.equal(mgPerMl(lactulose),667);
+assert.equal(volumeForMg(lactulose,667),1);
+const peg=get('makrogol-peg').products[0];
+assert.equal(peg.gramsPerSachet,4);
+assert.equal(peg.unit,'g');
+assert.equal(peg.form,'sachet');
+assert.ok(!('ml' in peg) && !('mg' in peg));
+assert.throws(()=>mgPerMl(peg),/invalid volume/);
+const epi=get('adrenalin-otoenjektor');
+assert.equal(epi.products.length,0,'Auto-injector device selection must remain blocked');
+assert.ok(epi.safetyNote.includes('geri çekilmiştir'));
 for(const c of data.candidates){
   assert.equal(c.calculatorEnabled,false);
   assert.equal(c.clinicalValidated,false);
