@@ -53,6 +53,26 @@
 </section>
 
 <section class="panel" id="sonuc" aria-live="polite"></section>
+<details class="panel kub-panel" id="kubPanel">
+  <summary>KÜB kaynaklı yeni antibiyotik hesapları · Kontrollü</summary>
+  <p class="hint">Bu bölümde yalnızca dar kapsamlı SEF ve BACTRİM rejimleri bulunur. Ürün KÜB metinleri kontrol edilmiştir; bağımsız klinik uzman onayı henüz tamamlanmamıştır. Hasta bazında tedavi kararı vermez.</p>
+  <label for="kubDrug">İlaç / doğrulanan endikasyon</label>
+  <select id="kubDrug">
+    <option value="sef">SEF 250 mg/5 mL — deri/yumuşak doku (1–11 yaş)</option>
+    <option value="bactrim">BACTRİM 200/40 mg/5 mL — duyarlı, komplike olmayan alt İYE (6 ay–12 yaş)</option>
+  </select>
+  <div class="kub-checks">
+    <label><input type="checkbox" id="kubAllergy"> Alerji/kontrendikasyon öyküsünü kontrol ettim; ilgili ilaca karşı bilinen kontrendike aşırı duyarlılık yok.</label>
+    <label><input type="checkbox" id="kubRenal"> Böbrek fonksiyonlarını klinik olarak değerlendirdim; doz ayarlaması gerektiren böbrek bozukluğu yok.</label>
+    <label><input type="checkbox" id="kubIndication"> Endikasyonu ve gerekli antibiyotik duyarlılık değerlendirmesini doğruladım; başka enfeksiyon rejimini kullanmıyorum.</label>
+    <label><input type="checkbox" id="kubSafety"> Karaciğer hastalığı, G6PD eksikliği, önemli ilaç etkileşimleri ve diğer KÜB uyarılarını değerlendirdim.</label>
+    <label><input type="checkbox" id="kubMeasured"> Hastanın gerçek tartı kilosunu kullandım; yaşa göre tahmin değildir.</label>
+    <label><input type="checkbox" id="kubPackage"> Elimdeki ürünün adını, uygulama yolunu ve konsantrasyonunu doğruladım.</label>
+  </div>
+  <button type="button" class="btn" id="kubCalc">KÜB doz karşılığını göster</button>
+  <div class="kub-output" id="kubResult" aria-live="polite"><div class="hint">Yaş ve kilo seçip klinik kontrolleri tamamlayın.</div></div>
+  <p class="hint">Böbrek yetmezliği, ciddi enfeksiyon, yeni doğan, PJP tedavi/profilaksisi ve diğer ilaç veya endikasyonlar bu bölümde hesaplanmaz. Muadil ürünlere otomatik geçiş yapılmaz.</p>
+</details>
 </div>
 <div id="iv" hidden>
 <div class="ivb">Ampul gücünü, seyreltmeyi ve veriliş hızını her seferinde kontrol edin.</div>
@@ -86,6 +106,8 @@
 </main>
 <script src="./drugs.js"></script>
 <script src="./app.js"></script>
+<script src="./kub-reference.js"></script>
+<script src="./kub-ui.js"></script>
 <script>if ("serviceWorker" in navigator) { window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {})); }</script>
 </body>
 </html>

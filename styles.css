@@ -90,3 +90,15 @@ footer{font-size:.78rem;color:var(--mute);text-align:center;margin-top:30px}
 html[data-theme="dark"] #imza img{filter:invert(1)}
 @media (prefers-color-scheme:dark){html:not([data-theme="light"]) #imza img{filter:invert(1)}}
 .kim{font-size:1rem;font-weight:500;margin-top:6px;color:var(--mute)}
+
+/* Source-reviewed, narrowly scoped KÜB reference section */
+.kub-panel{margin-top:14px}
+.kub-panel>summary{cursor:pointer;font-weight:700;color:var(--ink);padding:3px 0}
+.kub-panel>summary:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+.kub-checks{display:grid;gap:11px;margin:14px 0}
+.kub-checks label{display:flex;align-items:flex-start;gap:9px;font-size:.87rem;line-height:1.4;color:var(--ink);cursor:pointer}
+.kub-checks input{width:18px;height:18px;min-width:18px;accent-color:var(--accent);margin-top:1px}
+.kub-output{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.kub-output .big{overflow-wrap:anywhere;font-size:1.4rem}
+.kub-output a{color:var(--accent);overflow-wrap:anywhere}
+@media(max-width:400px){.kub-output .big{font-size:1.2rem}.kub-panel>summary{font-size:.92rem}}
