@@ -22,3 +22,5 @@ jobs:
         run: node tests/active-registry-guard.cjs
       - name: Check research-only dose engine with synthetic fixtures
         run: node tests/reviewed-dose-core.cjs
+      - name: Reject all unapproved drug candidates
+        run: node tests/unapproved-drug-lock.cjs
