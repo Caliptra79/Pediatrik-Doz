@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const api = require('../kub-reference.js');
 const approved = {
-  allergyChecked:true, renalChecked:true, indicationChecked:true, packageChecked:true
+  allergyChecked:true, renalChecked:true, indicationChecked:true, packageChecked:true, safetyChecked:true, measuredWeight:true
 };
 const calc = (id, ageMonths, weightKg, o={}) =>
   api.calculate({id,ageMonths,weightKg,...approved,...o});
