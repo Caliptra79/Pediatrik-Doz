@@ -13,7 +13,7 @@ KÜB 4.2: Çocuklarda 25–50 mg/kg/gün eşit bölünmüş doz; cilt ve yumuşa
 ## BACTRİM 200 mg SMZ + 40 mg TMP / 5 mL
 Güncel üretici KÜB: https://devacomtr.s3.eu-west-2.amazonaws.com/urunler/kub/bactrim-200-mg-40-mg5-ml-suspansiyon-kub-19-09-2025.pdf
 
-KÜB 4.1/4.2: Yalnızca koşulları karşılayan duyarlı akut enfeksiyonlarda; standart pediatrik yaş tablosu: 6 ay–5 yaş 5 mL / 12 saat, 6–12 yaş 10 mL / 12 saat. Standart doz yaklaşık 6 mg/kg/gün TMP + 30 mg/kg/gün SMZ olarak da tanımlanır. Yaş tablosu ile mg/kg yaklaşık değeri her kiloda bire bir örtüşmeyebilir.
+KÜB 4.1/4.2: Yalnızca koşulları karşılayan duyarlı akut enfeksiyonlarda; standart pediatrik yaş tablosu: 6 ay–5 yaş 5 mL / 12 saat, 6–12 yaş 10 mL / 12 saat. Standart doz yaklaşık 6 mg/kg/gün TMP + 30 mg/kg/gün SMZ olarak da tanımlanır. Yaş tablosu ile mg/kg yaklaşık değeri her kiloda bire bir örtüşmeyebilir. Uygulama, tablonun verdiği toplam TMP mg/kg/gün değeri KÜB'deki yaklaşık 6 mg/kg/gün değerinden %25'ten fazla saparsa sonuç üretmez. Bu %25 eşiği **KÜB kaynaklı klinik doz sınırı değil, daha fazla incelemeyi zorunlu kılan ihtiyatlı bir yazılım kontrolüdür.**
 
 **Uygulamanın sınırlı kapsamı:** Oral, 6 ay–12 yaş, 5–40 kg, duyarlılık değerlendirmesi yapılmış akut komplike olmayan alt idrar yolu enfeksiyonu. Yalnızca KÜB yaş tablosu gösterilir; kilo başına otomatik bireyselleştirilmiş reçete oluşturulmaz. PJP tedavisi/profilaksisi, toksoplazmozis, nokardiyozis ve diğer tablolar kapsam dışıdır. KÜB'e göre 12 yaş ve altı böbrek yetmezliği olan çocuklarda doz bilgisi bulunmadığından kullanıcı böbrek durumu onayı olmadan hesap yapılamaz. Sulfonamid/TMP aşırı duyarlılığı, ciddi karaciğer bozukluğu, G6PD ve etkileşimler ayrıca klinik olarak değerlendirilmelidir.
 
