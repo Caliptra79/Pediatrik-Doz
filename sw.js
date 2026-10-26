@@ -1,6 +1,6 @@
-// Sürüm v1.0. Uygulamayı güncelleyince CACHE adındaki sürümü değiştirin (ör. v1.1); eski önbellek kendiliğinden silinir.
-const CACHE = "doz-hesaplayici-v1.0";
-const ASSETS = ["./", "./index.html", "./manifest.json", "./favicon.ico", "./favicon-32.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
+// Sürüm v1.1. Uygulamayı güncelleyince CACHE adındaki sürümü değiştirin (ör. v1.1); eski önbellek kendiliğinden silinir.
+const CACHE = "doz-hesaplayici-v1.1";
+const ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.json", "./favicon.ico", "./favicon-32.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
