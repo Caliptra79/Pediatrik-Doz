@@ -22,6 +22,14 @@ for(const c of file.candidates){
     assert.ok(typeof p.name==='string' && p.name.trim());
     assert.ok(typeof p.source==='string' && /^https:\/\//.test(p.source),c.id+': ürün kaynağı eksik');
     assert.equal(p.status,'formulation-confirmed',c.id+': beklenmeyen onay durumu');
+    if(p.form==='sachet'){
+      assert.equal(p.route,'oral',c.id+': saşe yalnızca oral');
+      assert.equal(p.unit,'g',c.id+': saşe birimi gram olmalı');
+      assert.ok(Number.isFinite(p.gramsPerSachet)&&p.gramsPerSachet>0,c.id+': saşe gramajı geçersiz');
+      assert.ok(typeof p.ingredient==='string' && p.ingredient.trim(),c.id+': etken madde eksik');
+      assert.ok(!('mg' in p)&&!('ml' in p),c.id+': saşe sıvı konsantrasyonu olarak kaydedilemez');
+      continue;
+    }
     assert.ok(Number.isFinite(p.ml)&&p.ml>0,c.id+': hacim pozitif olmalı');
     if(p.ingredients){
       assert.ok(!('mg' in p),c.id+': kombine ilaç için tek mg alanı yasak');
