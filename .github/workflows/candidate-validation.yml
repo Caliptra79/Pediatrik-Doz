@@ -24,3 +24,5 @@ jobs:
         run: node tests/reviewed-dose-core.cjs
       - name: Reject all unapproved drug candidates
         run: node tests/unapproved-drug-lock.cjs
+      - name: Verify narrow source-reviewed KUB reference calculations
+        run: node tests/kub-reference.cjs
