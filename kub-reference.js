@@ -45,13 +45,19 @@
       const ml = ageMonths < 72 ? 5 : 10;
       const tmp = ml * 8;  // 40 mg TMP / 5 mL
       const smx = ml * 40; // 200 mg SMX / 5 mL
+      const tmpMgPerKgDay = tmp * 2 / weightKg;
+      // Conservative engineering refusal when KÜB age table greatly disagrees
+      // with KÜB's approximate 6 mg TMP/kg/day. Not a clinical dose range.
+      if (Math.abs(tmpMgPerKgDay - 6) / 6 > 0.25) {
+        throw new Error('KÜB yaş tablosu ile kilo başına yaklaşık TMP dozu belirgin uyumsuz; kişiselleştirilmiş hekim değerlendirmesi gerekli.');
+      }
       return Object.freeze({
         id, name: 'BACTRİM 200/40 mg / 5 mL',
         indication: 'Akut komplike olmayan alt üriner sistem enfeksiyonu; duyarlılık doğrulanmış',
         dosingBasis: 'KÜB 4.2 yaş tablosu, 12 saatte bir (bireyselleştirilmiş mg/kg doz değildir)',
         perDoseMg: [tmp, tmp], perDoseMl: [ml, ml],
         additionalPerDoseMg: Object.freeze({sulfametoksazol: smx}),
-        dailyMg: [tmp * 2, tmp * 2], dosesPerDay: 2,
+        dailyMg: [tmp * 2, tmp * 2], tmpMgPerKgDay, dosesPerDay: 2,
         note: 'Yaş tablosu standart dozdur; yaklaşık 6 mg TMP + 30 mg SMZ/kg/gün ifadesiyle bire bir örtüşmeyebilir. PJP tedavi/profilaksi rejimi değildir. Klinik bireyselleştirme gerekir.',
         source: SOURCES.bactrim
       });
