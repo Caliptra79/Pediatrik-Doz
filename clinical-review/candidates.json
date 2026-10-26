@@ -101,7 +101,28 @@
       "id": "budesonid-nebul",
       "name": "Budesonid nebül",
       "route": "inhalation",
-      "products": [],
+      "products": [
+        {
+          "name": "PULMICORT 0.25 mg/mL nebülizer süspansiyon (2 mL tek doz)",
+          "mg": 0.5,
+          "ml": 2,
+          "source": "https://www.astrazeneca.com.tr/content/dam/az-tr/medicine/PDF/newpdfs09062017/Pulmicort%200.25%20nebul-KUB-04.04.2013.pdf",
+          "status": "formulation-confirmed",
+          "form": "nebulizer-suspension",
+          "route": "inhalation",
+          "unit": "mg"
+        },
+        {
+          "name": "PULMICORT 0.5 mg/mL nebülizer süspansiyon (2 mL tek doz)",
+          "mg": 1,
+          "ml": 2,
+          "source": "https://ilac-kullanma-talimat.web.tr/pulmicort-0-5-mg-ml-nebuelizer-suespansiyon-147414/kisa-urun-bilgisi",
+          "status": "formulation-confirmed",
+          "form": "nebulizer-suspension",
+          "route": "inhalation",
+          "unit": "mg"
+        }
+      ],
       "clinicalValidated": false,
       "calculatorEnabled": false,
       "reviewedAt": null
@@ -110,7 +131,18 @@
       "id": "levosetirizin",
       "name": "Levosetirizin",
       "route": "oral",
-      "products": [],
+      "products": [
+        {
+          "name": "XYZAL 0.5 mg/mL oral çözelti",
+          "mg": 0.5,
+          "ml": 1,
+          "source": "https://kub.ilacprospektusu.com/ilac/9619-xyzal-0-5-mg-ml-oral-cozelti-kub",
+          "status": "formulation-confirmed",
+          "form": "oral-solution",
+          "route": "oral",
+          "unit": "mg"
+        }
+      ],
       "clinicalValidated": false,
       "calculatorEnabled": false,
       "reviewedAt": null
@@ -119,7 +151,20 @@
       "id": "ipratropium-bromur",
       "name": "İpratropium bromür",
       "route": "inhalation",
-      "products": [],
+      "products": [
+        {
+          "name": "ATROVENT 250 mcg/2 mL inhalasyon solüsyonu",
+          "mg": 0.25,
+          "ml": 2,
+          "source": "https://ilac-kullanma-talimat.web.tr/atrovent-250-mcg-2-ml-tek-dozluk-flakon-inhalasyon-soluesyonu-152196/kisa-urun-bilgisi",
+          "status": "formulation-confirmed",
+          "form": "nebulizer-solution",
+          "route": "inhalation",
+          "unit": "mg",
+          "labelUnit": "mcg",
+          "labelQuantity": 250
+        }
+      ],
       "clinicalValidated": false,
       "calculatorEnabled": false,
       "reviewedAt": null
