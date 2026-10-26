@@ -49,7 +49,23 @@
             }
           ],
           "ml": 5,
-          "source": "https://www.deva.com.tr/uploads/product_files/Dwnzuqcp8JqW2dt2vtzC.pdf",
+          "source": "https://devacomtr.s3.eu-west-2.amazonaws.com/urunler/kub/bactrim-200-mg-40-mg5-ml-suspansiyon-kub-19-09-2025.pdf",
+          "status": "formulation-confirmed"
+        },
+        {
+          "name": "TRİMOKS 200/40 mg/5 mL pediatrik süspansiyon",
+          "ingredients": [
+            {
+              "name": "sulfametoksazol",
+              "mg": 200
+            },
+            {
+              "name": "trimetoprim",
+              "mg": 40
+            }
+          ],
+          "ml": 5,
+          "source": "https://www.atabay.com/wp-content/uploads/2022/02/TRIMOKS-SUSP-KUB.pdf",
           "status": "formulation-confirmed"
         }
       ],
