@@ -20,3 +20,5 @@ jobs:
         run: node tests/formulation-arithmetic.cjs
       - name: Guard existing active drug registry and isolate candidates
         run: node tests/active-registry-guard.cjs
+      - name: Check research-only dose engine with synthetic fixtures
+        run: node tests/reviewed-dose-core.cjs
