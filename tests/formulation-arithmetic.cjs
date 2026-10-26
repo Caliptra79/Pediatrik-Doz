@@ -47,6 +47,22 @@ assert.deepEqual(concentrations,[6,12]);
 assert.equal(volumeForMg(oseltamivir.products.find(p=>mgPerMl(p)===6),30),5);
 assert.equal(volumeForMg(oseltamivir.products.find(p=>mgPerMl(p)===12),30),2.5);
 assert.notEqual(volumeForMg(oseltamivir.products[0],30),volumeForMg(oseltamivir.products[1],30));
+// Verified product concentrations; unit normalization is NOT clinical dosing.
+const budesonid=get('budesonid-nebul').products;
+assert.deepEqual(budesonid.map(p=>mgPerMl(p)),[0.25,0.5]);
+assert.deepEqual(budesonid.map(p=>p.mg),[0.5,1]);
+assert.ok(budesonid.every(p=>p.route==='inhalation'));
+const xyzal=get('levosetirizin').products[0];
+assert.equal(mgPerMl(xyzal),0.5);
+assert.equal(xyzal.route,'oral');
+const atrovent=get('ipratropium-bromur').products[0];
+assert.equal(atrovent.mg,0.25);
+assert.equal(atrovent.labelQuantity,250);
+assert.equal(atrovent.labelUnit,'mcg');
+assert.equal(mgPerMl(atrovent),0.125);
+assert.equal(atrovent.mg*1000,atrovent.labelQuantity);
+assert.equal(atrovent.route,'inhalation');
+assert.notEqual(atrovent.route,xyzal.route);
 for(const c of data.candidates){
   assert.equal(c.calculatorEnabled,false);
   assert.equal(c.clinicalValidated,false);
