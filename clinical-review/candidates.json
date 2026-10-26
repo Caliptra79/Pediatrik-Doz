@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-26",
+  "usage": "research-only",
+  "notice": "Do not use for dosing or treatment decisions; no calculator is enabled.",
+  "candidates": [
+    {
+      "id": "sefaleksin",
+      "name": "Sefaleksin",
+      "route": "oral",
+      "form": "suspension",
+      "products": [
+        {
+          "name": "SEF 250 mg/5 mL",
+          "mg": 250,
+          "ml": 5,
+          "source": "https://www.eczacibasiilac.com.tr/EIP/media/EIP_Media/PDF/e-KT/Sef250mgSusp-kt.pdf",
+          "status": "formulation-confirmed"
+        }
+      ],
+      "clinicalValidated": false,
+      "calculatorEnabled": false,
+      "reviewedAt": null
+    },
+    {
+      "id": "klindamisin",
+      "name": "Klindamisin",
+      "route": "oral",
+      "products": [],
+      "clinicalValidated": false,
+      "calculatorEnabled": false,
+      "reviewedAt": null
+    },
+    {
+      "id": "trimetoprim-sulfametoksazol",
+      "name": "Trimetoprim/sülfametoksazol",
+      "route": "oral",
+      "products": [
+        {
+          "name": "Bactrim 200/40 mg/5 mL",
+          "ingredients": [
+            {
+              "name": "sulfametoksazol",
+              "mg": 200
+            },
+            {
+              "name": "trimetoprim",
+              "mg": 40
+            }
+          ],
+          "ml": 5,
+          "source": "https://www.deva.com.tr/uploads/product_files/Dwnzuqcp8JqW2dt2vtzC.pdf",
+          "status": "formulation-confirmed"
+        }
+      ],
+      "clinicalValidated": false,
+      "calculatorEnabled": false,
+      "reviewedAt": null
+    },
+    {
+      "id": "oseltamivir",
+      "name": "Oseltamivir",
+      "route": "oral",
+      "products": [],
+      "clinicalValidated": false,
+      "calculatorEnabled": false,
+      "reviewedAt": null
+    },
+    {
+      "id": "budesonid-nebul",
+      "name": "Budesonid nebül",
+      "route": "inhalation",
+      "products": [],
+      "clinicalValidated": false,
+      "calculatorEnabled": false,
+      "reviewedAt": null
+    },
+    {
+      "id": "levosetirizin",
+      "name": "Levosetirizin",
+      "route": "oral",
+      "products": [],
+      "clinicalValidated": false,
+      "calculatorEnabled": false,
+      "reviewedAt": null
+    },
+    {
+      "id": "ipratropium-bromur",
+      "name": "İpratropium bromür",
+      "route": "inhalation",
+      "products": [],
+      "clinicalValidated": false,
+      "calculatorEnabled": false,
+      "reviewedAt": null
+    },
+    {
+      "id": "laktuloz",
+      "name": "Laktüloz",
+      "route": "oral",
+      "products": [],
+      "clinicalValidated": false,
+      "calculatorEnabled": false,
+      "reviewedAt": null
+    },
+    {
+      "id": "makrogol-peg",
+      "name": "Makrogol (PEG)",
+      "route": "oral",
+      "products": [],
+      "clinicalValidated": false,
+      "calculatorEnabled": false,
+      "reviewedAt": null
+    },
+    {
+      "id": "adrenalin-otoenjektor",
+      "name": "Adrenalin otoenjektör",
+      "route": "intramuscular-device",
+      "products": [],
+      "clinicalValidated": false,
+      "calculatorEnabled": false,
+      "reviewedAt": null
+    }
+  ]
+}
