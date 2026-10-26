@@ -16,3 +16,5 @@ jobs:
           node-version: '22'
       - name: Validate research-only candidate records
         run: node tests/validate-candidates.cjs
+      - name: Verify formulation conversions and combination ingredient isolation
+        run: node tests/formulation-arithmetic.cjs
