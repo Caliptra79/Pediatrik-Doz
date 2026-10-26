@@ -30,7 +30,9 @@
       allergyChecked:el('kubAllergy').checked,
       renalChecked:el('kubRenal').checked,
       indicationChecked:el('kubIndication').checked,
-      packageChecked:el('kubPackage').checked
+      packageChecked:el('kubPackage').checked,
+      safetyChecked:el('kubSafety').checked,
+      measuredWeight:el('kubMeasured').checked
     };
     let x;
     try{x=api.calculate(input);}catch(e){show(e.message,true);return;}
@@ -50,7 +52,8 @@
     a.textContent='Ürün KÜB kaynağını aç';
     result.appendChild(a);
   });
-  selection.addEventListener('change',()=>show('İlaç değişti. Ürün ve hastaya özel klinik kontrolleri yeniden gözden geçirin.',false));
-  ['kubAllergy','kubRenal','kubIndication','kubPackage'].forEach(id=>el(id).addEventListener('change',()=>show('Klinik kontroller değişti; yeniden hesaplayın.',false)));
-  ['kilo','yas'].forEach(id=>el(id).addEventListener('input',()=>show('Hasta verisi değişti; yeniden hesaplayın.',false)));
+  selection.addEventListener('change',()=>{resetChecks();show('İlaç değişti. Klinik kontrolleri yeni ilaç için yeniden tamamlayın.',false);});
+  ['kubAllergy','kubRenal','kubIndication','kubPackage','kubSafety','kubMeasured'].forEach(id=>el(id).addEventListener('change',()=>show('Klinik kontroller değişti; yeniden hesaplayın.',false)));
+  function resetChecks(){['kubAllergy','kubRenal','kubIndication','kubPackage','kubSafety','kubMeasured'].forEach(id=>{el(id).checked=false;});}
+  ['kilo','yas'].forEach(id=>el(id).addEventListener('input',()=>{resetChecks();show('Hasta verisi değişti. Klinik kontrolleri yeniden tamamlayın.',false);}));
 })();
